@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--project-ref=https://meztxbectoiageapafix.supabase.co"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lenR4YmVjdG9pYWdlYXBhZml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MDI0MTQsImV4cCI6MjA2OTk3ODQxNH0.io43P9H1FleRpfj6VTLCwSgsp-vFTCB25Mrd_YH1Bhs"
+      }
+    }
+  }
+}
