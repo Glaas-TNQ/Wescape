@@ -1,7 +1,7 @@
 # WeScape Agent Rules Standard
 
 When writing terminal commands, consider that the user is on a Windows machine 
-
+When writing lines on a file, or creating a file, always use the tools at your disposal, before suggesting to use a terminal comand
 ## 🧪 Testing & TDD
 - **TDD First**: scrivi sempre un test che fallisce prima dell'implementazione (Red-Green-Refactor)
 - **Test Fixtures**: usa `tests/fixtures/` per dati di test
