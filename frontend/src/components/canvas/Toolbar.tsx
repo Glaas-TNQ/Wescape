@@ -51,6 +51,24 @@ const Toolbar: React.FC = () => {
       y: 200 + Math.random() * 300,
     };
     addNode(type, position);
+    
+    // Show success toast
+    window.dispatchEvent(new CustomEvent('showToast', { 
+      detail: { message: `${getNodeTypeName(type)} aggiunto al canvas`, type: 'success' } 
+    }));
+  };
+
+  const getNodeTypeName = (type: NodeType) => {
+    const names = {
+      destination: 'Destinazione',
+      activity: 'Attività',
+      restaurant: 'Ristorante',
+      hotel: 'Hotel',
+      transport: 'Trasporto',
+      note: 'Nota',
+      dayDivider: 'Divisore Giorno',
+    };
+    return names[type] || 'Nodo';
   };
 
   const canUndo = historyIndex > 0;

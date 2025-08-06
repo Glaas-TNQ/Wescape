@@ -1,4 +1,5 @@
 import { Handle, Position, type NodeProps } from 'reactflow';
+import NodeActions from './NodeActions';
 
 export interface ActivityNodeData {
   title: string;
@@ -8,7 +9,11 @@ export interface ActivityNodeData {
   category?: string;
 }
 
-const ActivityNode = ({ data, selected }: NodeProps<ActivityNodeData>) => {
+interface ActivityNodeProps extends NodeProps<ActivityNodeData> {
+  id: string;
+}
+
+const ActivityNode = ({ data, selected, id }: ActivityNodeProps) => {
   return (
     <div className={`
       min-w-[200px] p-4 rounded-xl border-2 relative cursor-move group
@@ -26,15 +31,7 @@ const ActivityNode = ({ data, selected }: NodeProps<ActivityNodeData>) => {
         className="w-3 h-3 !bg-cyan-500 !border-2 !border-cyan-300" 
       />
       
-      {/* Node Actions */}
-      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button className="w-6 h-6 bg-white/10 hover:bg-white/20 rounded border border-white/20 flex items-center justify-center text-xs">
-          ✏️
-        </button>
-        <button className="w-6 h-6 bg-white/10 hover:bg-red-500/30 rounded border border-white/20 flex items-center justify-center text-xs">
-          🗑️
-        </button>
-      </div>
+      <NodeActions nodeId={id} nodeType="Attività" />
       
       <div className="flex items-center gap-2 mb-2">
         <span className="text-2xl">🎯</span>

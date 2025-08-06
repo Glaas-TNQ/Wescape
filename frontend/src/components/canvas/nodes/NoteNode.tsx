@@ -1,4 +1,5 @@
 import { Handle, Position, type NodeProps } from 'reactflow';
+import NodeActions from './NodeActions';
 
 export interface NoteNodeData {
   title: string;
@@ -6,7 +7,11 @@ export interface NoteNodeData {
   color?: 'yellow' | 'blue' | 'green' | 'pink';
 }
 
-const NoteNode = ({ data, selected }: NodeProps<NoteNodeData>) => {
+interface NoteNodeProps extends NodeProps<NoteNodeData> {
+  id: string;
+}
+
+const NoteNode = ({ data, selected, id }: NoteNodeProps) => {
   const getColorClasses = () => {
     switch (data.color) {
       case 'blue':
@@ -56,15 +61,7 @@ const NoteNode = ({ data, selected }: NodeProps<NoteNodeData>) => {
         className={`w-3 h-3 ${colors.handle}`}
       />
       
-      {/* Node Actions */}
-      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button className="w-6 h-6 bg-white/10 hover:bg-white/20 rounded border border-white/20 flex items-center justify-center text-xs">
-          ✏️
-        </button>
-        <button className="w-6 h-6 bg-white/10 hover:bg-red-500/30 rounded border border-white/20 flex items-center justify-center text-xs">
-          🗑️
-        </button>
-      </div>
+      <NodeActions nodeId={id} nodeType="Nota" />
       
       <div className="flex items-center gap-2 mb-2">
         <span className="text-2xl">📝</span>

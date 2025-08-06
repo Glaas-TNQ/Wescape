@@ -1,4 +1,5 @@
 import { Handle, Position, type NodeProps } from 'reactflow';
+import NodeActions from './NodeActions';
 
 export interface DayDividerNodeData {
   day: number;
@@ -6,7 +7,11 @@ export interface DayDividerNodeData {
   title?: string;
 }
 
-const DayDividerNode = ({ data, selected }: NodeProps<DayDividerNodeData>) => {
+interface DayDividerNodeProps extends NodeProps<DayDividerNodeData> {
+  id: string;
+}
+
+const DayDividerNode = ({ data, selected, id }: DayDividerNodeProps) => {
   return (
     <div className={`
       min-w-[300px] p-6 rounded-xl border-2 relative cursor-move group
@@ -26,15 +31,7 @@ const DayDividerNode = ({ data, selected }: NodeProps<DayDividerNodeData>) => {
         className="w-4 h-4 !bg-indigo-500 !border-2 !border-indigo-300" 
       />
       
-      {/* Node Actions */}
-      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button className="w-6 h-6 bg-white/10 hover:bg-white/20 rounded border border-white/20 flex items-center justify-center text-xs">
-          ✏️
-        </button>
-        <button className="w-6 h-6 bg-white/10 hover:bg-red-500/30 rounded border border-white/20 flex items-center justify-center text-xs">
-          🗑️
-        </button>
-      </div>
+      <NodeActions nodeId={id} nodeType="Divisore Giorno" />
       
       {/* Day Badge */}
       <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 mb-3">

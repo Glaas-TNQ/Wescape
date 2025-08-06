@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -11,21 +11,70 @@ import 'reactflow/dist/style.css';
 import { nodeTypes } from './nodes';
 import { useCanvasStore } from '../../stores/canvasStore';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
+import { validateConnection } from '../../utils/connectionRules';
 import Toolbar from './Toolbar';
 import ViewSwitcher from './ViewSwitcher';
+import NodeEditModal from './NodeEditModal';
+import EmptyState from './EmptyState';
+import ToastContainer from '../ui/ToastContainer';
+import { useToast } from '../../hooks/useToast';
 
 const TripCanvas = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
+  const { toasts, removeToast, toast } = useToast();
+  
   const {
     nodes,
     edges,
     onNodesChange,
     onEdgesChange,
-    onConnect,
+    onConnect: storeOnConnect,
+    deleteNodes,
   } = useCanvasStore();
+
+  // Custom onConnect with validation
+  const onConnect = useCallback((connection: any) => {
+    const validation = validateConnection(connection, nodes);
+    
+    if (!validation.isValid) {
+      toast.error(validation.reason || 'Connessione non valida');
+      return;
+    }
+    
+    storeOnConnect(connection);
+    toast.success('Connessione creata');
+  }, [nodes, storeOnConnect, toast]);
 
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
+
+  // Handle node edit/delete events from nodes
+  useEffect(() => {
+    const handleEditNode = (event: CustomEvent) => {
+      setEditingNodeId(event.detail.nodeId);
+    };
+
+    const handleDeleteNode = (event: CustomEvent) => {
+      deleteNodes([event.detail.nodeId]);
+      toast.success('Nodo eliminato con successo');
+    };
+
+    const handleShowToast = (event: CustomEvent) => {
+      const { message, type } = event.detail;
+      toast[type](message);
+    };
+
+    window.addEventListener('editNode', handleEditNode as EventListener);
+    window.addEventListener('deleteNode', handleDeleteNode as EventListener);
+    window.addEventListener('showToast', handleShowToast as EventListener);
+
+    return () => {
+      window.removeEventListener('editNode', handleEditNode as EventListener);
+      window.removeEventListener('deleteNode', handleDeleteNode as EventListener);
+      window.removeEventListener('showToast', handleShowToast as EventListener);
+    };
+  }, [deleteNodes]);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -121,6 +170,9 @@ const TripCanvas = () => {
             <Toolbar />
           </Panel>
         </ReactFlow>
+        
+        {/* Empty State */}
+        {nodes.length === 0 && <EmptyState />}
       </div>
 
       {/* Top Bar - Overlay */}
@@ -140,6 +192,19 @@ const TripCanvas = () => {
           </button>
         </div>
       </div>
+
+      {/* Node Edit Modal */}
+      <NodeEditModal
+        nodeId={editingNodeId}
+        isOpen={!!editingNodeId}
+        onClose={() => {
+          setEditingNodeId(null);
+          toast.success('Nodo aggiornato');
+        }}
+      />
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </div>
   );
 };

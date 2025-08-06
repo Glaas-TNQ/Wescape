@@ -1,4 +1,5 @@
 import { Handle, Position, type NodeProps } from 'reactflow';
+import NodeActions from './NodeActions';
 
 export interface RestaurantNodeData {
   title: string;
@@ -9,7 +10,11 @@ export interface RestaurantNodeData {
   rating?: number;
 }
 
-const RestaurantNode = ({ data, selected }: NodeProps<RestaurantNodeData>) => {
+interface RestaurantNodeProps extends NodeProps<RestaurantNodeData> {
+  id: string;
+}
+
+const RestaurantNode = ({ data, selected, id }: RestaurantNodeProps) => {
   return (
     <div className={`
       min-w-[200px] p-4 rounded-xl border-2 relative cursor-move group
@@ -27,15 +32,7 @@ const RestaurantNode = ({ data, selected }: NodeProps<RestaurantNodeData>) => {
         className="w-3 h-3 !bg-amber-500 !border-2 !border-amber-300" 
       />
       
-      {/* Node Actions */}
-      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button className="w-6 h-6 bg-white/10 hover:bg-white/20 rounded border border-white/20 flex items-center justify-center text-xs">
-          ✏️
-        </button>
-        <button className="w-6 h-6 bg-white/10 hover:bg-red-500/30 rounded border border-white/20 flex items-center justify-center text-xs">
-          🗑️
-        </button>
-      </div>
+      <NodeActions nodeId={id} nodeType="Ristorante" />
       
       <div className="flex items-center gap-2 mb-2">
         <span className="text-2xl">🍽️</span>
