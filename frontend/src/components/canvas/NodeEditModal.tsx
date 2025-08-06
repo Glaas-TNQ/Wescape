@@ -317,41 +317,41 @@ const NodeEditModal: React.FC<NodeEditModalProps> = ({ nodeId, isOpen, onClose }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 border border-white/20 rounded-xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+      <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
-          <h2 className="text-xl font-bold text-white">
+        <div className="flex items-center justify-between px-8 py-6 border-b border-white/10">
+          <h2 className="text-2xl font-bold text-white">
             Modifica {getNodeTypeLabel(node.type as NodeType)}
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center text-white transition-colors flex-shrink-0"
+            className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white transition-colors flex-shrink-0 text-lg"
           >
             ✕
           </button>
         </div>
 
         {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="space-y-5">
+        <div className="flex-1 overflow-y-auto px-8 py-6">
+          <div className="space-y-6 max-w-none">
             {getFormFields()}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 p-6 pt-4 border-t border-white/10 bg-gray-900/50">
+        <div className="flex gap-4 px-8 py-6 border-t border-white/10 bg-gray-900/70">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors font-medium"
+            className="flex-1 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-all font-medium hover:scale-[1.02]"
           >
             Annulla
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-lg text-white font-medium transition-colors"
+            className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-xl text-white font-medium transition-all hover:scale-[1.02] shadow-lg shadow-indigo-600/25"
           >
-            Salva
+            Salva Modifiche
           </button>
         </div>
       </div>
@@ -383,8 +383,8 @@ const FormField: React.FC<FormFieldProps> = ({
   type = 'text',
   ...props
 }) => {
-  const inputClassName = `w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/50 transition-all ${
-    multiline ? 'resize-vertical min-h-[100px]' : ''
+  const inputClassName = `w-full px-5 py-4 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 transition-all hover:border-white/30 text-base ${
+    multiline ? 'resize-vertical min-h-[120px]' : 'h-14'
   }`;
 
   return (
@@ -425,10 +425,10 @@ const FormSelect: React.FC<FormSelectProps> = ({ label, value, onChange, options
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/50 transition-all"
+      className="w-full px-5 py-4 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 transition-all hover:border-white/30 text-base h-14"
     >
       {options.map((option) => (
-        <option key={option.value} value={option.value} className="bg-gray-800">
+        <option key={option.value} value={option.value} className="bg-gray-800 py-2">
           {option.label}
         </option>
       ))}

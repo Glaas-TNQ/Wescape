@@ -5,6 +5,7 @@ import ReactFlow, {
   MiniMap,
   Panel,
   ReactFlowProvider,
+  SelectionMode,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -46,6 +47,19 @@ const TripCanvas = () => {
     toast.success('Connessione creata');
   }, [nodes, storeOnConnect, toast]);
 
+  // Handle node selection changes
+  const onSelectionChange = useCallback(({ nodes: selectedNodes }: any) => {
+    // Update selected nodes in store if needed
+    console.log('Selected nodes:', selectedNodes);
+  }, []);
+
+  // Handle delete key for selected nodes
+  const onNodesDelete = useCallback((deletedNodes: any[]) => {
+    const nodeIds = deletedNodes.map(node => node.id);
+    deleteNodes(nodeIds);
+    toast.success(`${nodeIds.length} nodi eliminati`);
+  }, [deleteNodes, toast]);
+
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
 
@@ -62,7 +76,10 @@ const TripCanvas = () => {
 
     const handleShowToast = (event: CustomEvent) => {
       const { message, type } = event.detail;
-      toast[type](message);
+      if (type === 'success') toast.success(message);
+      else if (type === 'error') toast.error(message);
+      else if (type === 'warning') toast.warning(message);
+      else toast.info(message);
     };
 
     window.addEventListener('editNode', handleEditNode as EventListener);
@@ -126,9 +143,32 @@ const TripCanvas = () => {
   };
 
   return (
-    <div className="w-screen h-screen relative overflow-hidden" style={canvasStyle}>
-      {/* Canvas - Full Screen */}
-      <div className="w-full h-full absolute inset-0" ref={reactFlowWrapper}>
+    <div className="w-screen h-screen flex flex-col" style={canvasStyle}>
+      {/* Top Bar - Fixed Header */}
+      <div className="h-20 bg-gray-900/95 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-8 z-50 flex-shrink-0">
+        <div className="flex items-center gap-4">
+          <div className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            WeScape Canvas
+          </div>
+          <div className="text-sm text-gray-400 bg-gray-800/50 px-3 py-1 rounded-full">
+            {nodes.length} elementi
+          </div>
+        </div>
+        
+        <ViewSwitcher />
+        
+        <div className="flex gap-4">
+          <button className="px-5 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-all hover:scale-105 font-medium">
+            Share
+          </button>
+          <button className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white font-medium hover:from-indigo-500 hover:to-purple-500 transition-all hover:scale-105 shadow-lg shadow-indigo-600/25">
+            Save Trip
+          </button>
+        </div>
+      </div>
+
+      {/* Canvas - Takes remaining space */}
+      <div className="flex-1 relative" ref={reactFlowWrapper}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -137,12 +177,23 @@ const TripCanvas = () => {
           onConnect={onConnect}
           onDrop={onDrop}
           onDragOver={onDragOver}
+          onSelectionChange={onSelectionChange}
+          onNodesDelete={onNodesDelete}
           nodeTypes={nodeTypes}
           fitView
           snapToGrid
           snapGrid={[15, 15]}
           attributionPosition="bottom-right"
-          className="bg-transparent w-full h-full"
+          className="w-full h-full"
+          selectionOnDrag
+          panOnDrag={[1, 2]}
+          selectionMode={SelectionMode.Partial}
+          multiSelectionKeyCode={['Meta', 'Shift']}
+          deleteKeyCode={['Backspace', 'Delete']}
+          selectionKeyCode={null}
+          nodesConnectable={true}
+          nodesDraggable={true}
+          elementsSelectable={true}
         >
           {/* Background with dots pattern */}
           <Background 
@@ -166,31 +217,13 @@ const TripCanvas = () => {
           />
           
           {/* Toolbar Panel */}
-          <Panel position="top-left" className="mt-20">
+          <Panel position="top-left" className="m-4">
             <Toolbar />
           </Panel>
         </ReactFlow>
         
         {/* Empty State */}
         {nodes.length === 0 && <EmptyState />}
-      </div>
-
-      {/* Top Bar - Overlay */}
-      <div className="absolute top-0 left-0 right-0 h-16 bg-gray-900/95 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-6 z-50">
-        <div className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-          WeScape Canvas
-        </div>
-        
-        <ViewSwitcher />
-        
-        <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-colors">
-            Share
-          </button>
-          <button className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white font-medium hover:from-indigo-500 hover:to-purple-500 transition-colors">
-            Save Trip
-          </button>
-        </div>
       </div>
 
       {/* Node Edit Modal */}

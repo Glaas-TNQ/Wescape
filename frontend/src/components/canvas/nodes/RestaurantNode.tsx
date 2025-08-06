@@ -1,4 +1,5 @@
-import { Handle, Position, type NodeProps } from 'reactflow';
+import { useState } from 'react';
+import { Handle, Position, NodeResizer, type NodeProps } from 'reactflow';
 import NodeActions from './NodeActions';
 
 export interface RestaurantNodeData {
@@ -15,21 +16,81 @@ interface RestaurantNodeProps extends NodeProps<RestaurantNodeData> {
 }
 
 const RestaurantNode = ({ data, selected, id }: RestaurantNodeProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
   return (
-    <div className={`
-      min-w-[200px] p-4 rounded-xl border-2 relative cursor-move group
-      transition-all duration-200 backdrop-blur-md
-      ${selected 
-        ? 'border-amber-400 shadow-lg shadow-amber-500/25 scale-105' 
-        : 'border-amber-600 hover:border-amber-400 hover:scale-102'
-      }
-      bg-gradient-to-br from-amber-900/20 to-orange-800/10
-      hover:from-amber-900/30 hover:to-orange-800/20
-    `}>
+    <>
+      <NodeResizer 
+        color="rgb(245, 158, 11)" 
+        isVisible={selected || isHovered}
+        minWidth={180}
+        minHeight={100}
+      />
+      <div 
+        className={`
+          min-w-[200px] p-4 rounded-xl border-2 relative cursor-move group
+          transition-all duration-300 backdrop-blur-md w-full h-full
+          ${selected 
+            ? 'border-amber-400 shadow-2xl shadow-amber-500/40 ring-4 ring-amber-400/30 bg-gradient-to-br from-amber-900/40 to-orange-800/30' 
+            : 'border-amber-600 hover:border-amber-400 bg-gradient-to-br from-amber-900/20 to-orange-800/10 hover:from-amber-900/30 hover:to-orange-800/20'
+          }
+        `}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onDoubleClick={() => {
+          window.dispatchEvent(new CustomEvent('editNode', { detail: { nodeId: id } }));
+        }}
+      >
+      {/* Handles - Top, Right, Bottom, Left */}
       <Handle 
         type="target" 
         position={Position.Top} 
-        className="w-3 h-3 !bg-amber-500 !border-2 !border-amber-300" 
+        id="top"
+        className="w-4 h-4 !bg-amber-500 !border-2 !border-amber-300 hover:!bg-amber-400 hover:!scale-125 transition-all duration-200" 
+      />
+      <Handle 
+        type="target" 
+        position={Position.Right} 
+        id="right"
+        className="w-4 h-4 !bg-amber-500 !border-2 !border-amber-300 hover:!bg-amber-400 hover:!scale-125 transition-all duration-200" 
+      />
+      <Handle 
+        type="target" 
+        position={Position.Bottom} 
+        id="bottom"
+        className="w-4 h-4 !bg-amber-500 !border-2 !border-amber-300 hover:!bg-amber-400 hover:!scale-125 transition-all duration-200" 
+      />
+      <Handle 
+        type="target" 
+        position={Position.Left} 
+        id="left"
+        className="w-4 h-4 !bg-amber-500 !border-2 !border-amber-300 hover:!bg-amber-400 hover:!scale-125 transition-all duration-200" 
+      />
+      
+      {/* Source Handles */}
+      <Handle 
+        type="source" 
+        position={Position.Top} 
+        id="source-top"
+        className="w-4 h-4 !bg-amber-400 !border-2 !border-amber-300 hover:!bg-amber-300 hover:!scale-125 transition-all duration-200" 
+      />
+      <Handle 
+        type="source" 
+        position={Position.Right} 
+        id="source-right"
+        className="w-4 h-4 !bg-amber-400 !border-2 !border-amber-300 hover:!bg-amber-300 hover:!scale-125 transition-all duration-200" 
+      />
+      <Handle 
+        type="source" 
+        position={Position.Bottom} 
+        id="source-bottom"
+        className="w-4 h-4 !bg-amber-400 !border-2 !border-amber-300 hover:!bg-amber-300 hover:!scale-125 transition-all duration-200" 
+      />
+      <Handle 
+        type="source" 
+        position={Position.Left} 
+        id="source-left"
+        className="w-4 h-4 !bg-amber-400 !border-2 !border-amber-300 hover:!bg-amber-300 hover:!scale-125 transition-all duration-200" 
       />
       
       <NodeActions nodeId={id} nodeType="Ristorante" />
@@ -43,7 +104,9 @@ const RestaurantNode = ({ data, selected, id }: RestaurantNodeProps) => {
         <p className="text-xs text-amber-300 mb-1">{data.time}</p>
       )}
       
-      <p className="text-sm text-gray-300 leading-relaxed">{data.description}</p>
+      <p className="text-sm text-gray-300 leading-relaxed overflow-hidden text-ellipsis line-clamp-3">
+        {data.description}
+      </p>
       
       <div className="flex gap-2 mt-2">
         {data.cuisine && (
@@ -58,12 +121,8 @@ const RestaurantNode = ({ data, selected, id }: RestaurantNodeProps) => {
         )}
       </div>
       
-      <Handle 
-        type="source" 
-        position={Position.Bottom} 
-        className="w-3 h-3 !bg-amber-500 !border-2 !border-amber-300" 
-      />
-    </div>
+      </div>
+    </>
   );
 };
 
