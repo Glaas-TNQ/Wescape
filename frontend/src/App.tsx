@@ -7,7 +7,7 @@ function App() {
   }, []);
 
   return (
-    <div className="h-screen w-screen bg-black">
+    <div className="h-screen w-screen bg-black overflow-hidden">
       <TripCanvas />
     </div>
   );

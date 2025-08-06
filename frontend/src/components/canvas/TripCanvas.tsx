@@ -77,27 +77,9 @@ const TripCanvas = () => {
   };
 
   return (
-    <div className="w-full h-screen relative" style={canvasStyle}>
-      {/* Top Bar */}
-      <div className="absolute top-0 left-0 right-0 h-16 bg-gray-900/95 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-6 z-50">
-        <div className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-          WeScape Canvas
-        </div>
-        
-        <ViewSwitcher />
-        
-        <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-colors">
-            Share
-          </button>
-          <button className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white font-medium hover:from-indigo-500 hover:to-purple-500 transition-colors">
-            Save Trip
-          </button>
-        </div>
-      </div>
-
-      {/* Canvas */}
-      <div className="w-full h-full pt-16" ref={reactFlowWrapper}>
+    <div className="w-screen h-screen relative overflow-hidden" style={canvasStyle}>
+      {/* Canvas - Full Screen */}
+      <div className="w-full h-full absolute inset-0" ref={reactFlowWrapper}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -111,7 +93,7 @@ const TripCanvas = () => {
           snapToGrid
           snapGrid={[15, 15]}
           attributionPosition="bottom-right"
-          className="bg-transparent"
+          className="bg-transparent w-full h-full"
         >
           {/* Background with dots pattern */}
           <Background 
@@ -135,10 +117,28 @@ const TripCanvas = () => {
           />
           
           {/* Toolbar Panel */}
-          <Panel position="top-left" className="mt-4">
+          <Panel position="top-left" className="mt-20">
             <Toolbar />
           </Panel>
         </ReactFlow>
+      </div>
+
+      {/* Top Bar - Overlay */}
+      <div className="absolute top-0 left-0 right-0 h-16 bg-gray-900/95 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-6 z-50">
+        <div className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+          WeScape Canvas
+        </div>
+        
+        <ViewSwitcher />
+        
+        <div className="flex gap-3">
+          <button className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-colors">
+            Share
+          </button>
+          <button className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white font-medium hover:from-indigo-500 hover:to-purple-500 transition-colors">
+            Save Trip
+          </button>
+        </div>
       </div>
     </div>
   );
