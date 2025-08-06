@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import CanvasMWP from './components/canvas/CanvasMWP';
+import TripCanvas from './components/canvas/TripCanvas';
 
 function App() {
   useEffect(() => {
@@ -7,8 +7,8 @@ function App() {
   }, []);
 
   return (
-    <div className="h-screen w-screen">
-      <CanvasMWP />
+    <div className="h-screen w-screen bg-black">
+      <TripCanvas />
     </div>
   );
 }

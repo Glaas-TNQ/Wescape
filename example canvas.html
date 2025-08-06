@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeScape Canvas - Interactive Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Main Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* View Switcher */
+        .view-switcher {
+            display: flex;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .view-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: #6366f1;
+            color: white;
+        }
+
+        .view-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Canvas Area */
+        .canvas-area {
+            flex: 1;
+            position: relative;
+            margin-top: 60px;
+            background: #050505;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+        }
+
+        .canvas-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(30, 30, 30, 0.9);
+            padding: 8px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tool-btn {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .tool-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: #6366f1;
+            transform: scale(1.05);
+        }
+
+        .tool-tooltip {
+            position: absolute;
+            left: 54px;
+            background: rgba(20, 20, 20, 0.95);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .tool-btn:hover .tool-tooltip {
+            opacity: 1;
+        }
+
+        /* Nodes */
+        .node {
+            position: absolute;
+            background: rgba(30, 30, 30, 0.95);
+            border: 2px solid;
+            border-radius: 12px;
+            padding: 16px;
+            min-width: 200px;
+            cursor: move;
+            transition: transform 0.2s, box-shadow 0.2s;
+            backdrop-filter: blur(10px);
+        }
+
+        .node:hover {
+            transform: scale(1.02);
+            z-index: 10;
+        }
+
+        .node.destination {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.1));
+        }
+
+        .node.activity {
+            border-color: #06b6d4;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(14, 165, 233, 0.1));
+        }
+
+        .node.restaurant {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.1));
+        }
+
+        .node.hotel {
+            border-color: #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(34, 197, 94, 0.1));
+        }
+
+        .node.transport {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(248, 113, 113, 0.1));
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .node-icon {
+            font-size: 24px;
+        }
+
+        .node-title {
+            font-weight: 600;
+            color: white;
+        }
+
+        .node-time {
+            font-size: 12px;
+            color: #a78bfa;
+            margin-bottom: 4px;
+        }
+
+        .node-description {
+            font-size: 13px;
+            color: #999;
+            line-height: 1.4;
+        }
+
+        .node-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .node:hover .node-actions {
+            opacity: 1;
+        }
+
+        .node-action {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .node-action:hover {
+            background: rgba(99, 102, 241, 0.3);
+        }
+
+        /* Connections */
+        .connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #6366f1, transparent);
+            transform-origin: left center;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .connection::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #6366f1;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        /* AI Suggestions Panel */
+        .suggestions-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: rgba(30, 30, 30, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .suggestions-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #a78bfa;
+        }
+
+        .suggestion-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion-card:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: #6366f1;
+        }
+
+        .suggestion-icon {
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .suggestion-text {
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        /* Timeline View */
+        .timeline-view {
+            display: none;
+            padding: 40px;
+            overflow-y: auto;
+            height: calc(100vh - 60px);
+        }
+
+        .timeline-view.active {
+            display: block;
+        }
+
+        .timeline-day {
+            margin-bottom: 40px;
+        }
+
+        .timeline-day-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .timeline-day-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .timeline-day-info h3 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .timeline-day-date {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .timeline-items {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-left: 76px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #6366f1;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .timeline-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateX(4px);
+        }
+
+        .timeline-item-time {
+            min-width: 60px;
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        /* Mini Map */
+        .minimap {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 150px;
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .minimap-viewport {
+            width: 100%;
+            height: 100%;
+            background: rgba(99, 102, 241, 0.1);
+            border: 2px solid #6366f1;
+            border-radius: 4px;
+        }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 8px;
+            background: rgba(30, 30, 30, 0.9);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: #6366f1;
+        }
+
+        /* Chat Sidebar */
+        .chat-sidebar {
+            position: absolute;
+            right: -400px;
+            top: 60px;
+            width: 400px;
+            height: calc(100vh - 60px);
+            background: rgba(20, 20, 20, 0.98);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-sidebar.open {
+            right: 0;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chat-close {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .chat-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .chat-message {
+            margin-bottom: 16px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .chat-message.ai {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-right: 40px;
+        }
+
+        .chat-message.user {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-left: 40px;
+            text-align: right;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(30, 30, 30, 0.95);
+            border: 1px solid rgba(99, 102, 241, 0.5);
+            border-radius: 8px;
+            padding: 12px 20px;
+            color: white;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Collaboration Cursors */
+        .cursor {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            pointer-events: none;
+            transition: all 0.1s ease;
+            z-index: 1000;
+        }
+
+        .cursor-label {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: row;
+                top: auto;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .suggestions-panel {
+                width: calc(100% - 40px);
+                top: auto;
+                bottom: 80px;
+            }
+            
+            .chat-sidebar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="logo">WeScape</div>
+            
+            <div class="view-switcher">
+                <button class="view-btn active" onclick="switchView('canvas')">
+                    <span>🎨</span> Canvas
+                </button>
+                <button class="view-btn" onclick="switchView('timeline')">
+                    <span>📅</span> Timeline
+                </button>
+                <button class="view-btn" onclick="switchView('map')">
+                    <span>🗺️</span> Mappa
+                </button>
+                <button class="view-btn" onclick="switchView('budget')">
+                    <span>💰</span> Budget
+                </button>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button style="padding: 8px 16px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white; cursor: pointer;">
+                    Share
+                </button>
+                <button style="padding: 8px 16px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 500;">
+                    Save Trip
+                </button>
+            </div>
+        </div>
+
+        <!-- Canvas View -->
+        <div class="canvas-area" id="canvasView">
+            <div class="canvas-grid"></div>
+            
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <button class="tool-btn" onclick="addNode('destination')">
+                    📍
+                    <span class="tool-tooltip">Aggiungi Destinazione</span>
+                </button>
+                <button class="tool-btn" onclick="addNode('activity')">
+                    🎯
+                    <span class="tool-tooltip">Aggiungi Attività</span>
+                </button>
+                <button class="tool-btn" onclick="addNode('restaurant')">
+                    🍽️
+                    <span class="tool-tooltip">Aggiungi Ristorante</span>
+                </button>
+                <button class="tool-btn" onclick="addNode('hotel')">
+                    🏨
+                    <span class="tool-tooltip">Aggiungi Hotel</span>
+                </button>
+                <button class="tool-btn" onclick="addNode('transport')">
+                    🚗
+                    <span class="tool-tooltip">Aggiungi Trasporto</span>
+                </button>
+                <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 4px 0;"></div>
+                <button class="tool-btn" onclick="autoLayout()">
+                    ✨
+                    <span class="tool-tooltip">Auto Layout</span>
+                </button>
+            </div>
+
+            <!-- Sample Nodes -->
+            <div class="node destination" style="top: 100px; left: 200px;" id="node1">
+                <div class="node-actions">
+                    <div class="node-action" onclick="editNode('node1')">✏️</div>
+                    <div class="node-action">🗑️</div>
+                </div>
+                <div class="node-header">
+                    <span class="node-icon">📍</span>
+                    <span class="node-title">Roma</span>
+                </div>
+                <div class="node-time">15-18 Maggio 2024</div>
+                <div class="node-description">La città eterna ti aspetta con la sua storia millenaria</div>
+            </div>
+
+            <div class="node activity" style="top: 100px; left: 500px;" id="node2">
+                <div class="node-actions">
+                    <div class="node-action" onclick="editNode('node2')">✏️</div>
+                    <div class="node-action">🗑️</div>
+                </div>
+                <div class="node-header">
+                    <span class="node-icon">🎯</span>
+                    <span class="node-title">Colosseo</span>
+                </div>
+                <div class="node-time">Giorno 1 • 09:00-12:00</div>
+                <div class="node-description">Tour guidato con accesso prioritario</div>
+            </div>
+
+            <div class="node restaurant" style="top: 300px; left: 350px;" id="node3">
+                <div class="node-actions">
+                    <div class="node-action" onclick="editNode('node3')">✏️</div>
+                    <div class="node-action">🗑️</div>
+                </div>
+                <div class="node-header">
+                    <span class="node-icon">🍽️</span>
+                    <span class="node-title">Trattoria Monti</span>
+                </div>
+                <div class="node-time">Giorno 1 • 13:00</div>
+                <div class="node-description">Cucina romana autentica • €€</div>
+            </div>
+
+            <div class="node hotel" style="top: 300px; left: 650px;" id="node4">
+                <div class="node-actions">
+                    <div class="node-action" onclick="editNode('node4')">✏️</div>
+                    <div class="node-action">🗑️</div>
+                </div>
+                <div class="node-header">
+                    <span class="node-icon">🏨</span>
+                    <span class="node-title">Hotel Artemide</span>
+                </div>
+                <div class="node-time">Check-in: 15 Maggio</div>
+                <div class="node-description">4★ Near Termini Station</div>
+            </div>
+
+            <!-- Connections -->
+            <div class="connection" style="width: 260px; top: 150px; left: 400px; transform: rotate(0deg);"></div>
+            <div class="connection" style="width: 200px; top: 200px; left: 450px; transform: rotate(35deg);"></div>
+
+            <!-- AI Suggestions Panel -->
+            <div class="suggestions-panel">
+                <div class="suggestions-title">💡 AI Suggestions</div>
+                <div class="suggestion-card" onclick="applySuggestion(1)">
+                    <span class="suggestion-icon">⚠️</span>
+                    <span class="suggestion-text">Il Colosseo e i Musei Vaticani lo stesso giorno potrebbero essere troppo impegnativi</span>
+                </div>
+                <div class="suggestion-card" onclick="applySuggestion(2)">
+                    <span class="suggestion-icon">💡</span>
+                    <span class="suggestion-text">Aggiungi una pausa pranzo tra le due attività principali</span>
+                </div>
+                <div class="suggestion-card" onclick="applySuggestion(3)">
+                    <span class="suggestion-icon">🚶</span>
+                    <span class="suggestion-text">Trastevere è perfetto per la sera del Giorno 2</span>
+                </div>
+            </div>
+
+            <!-- Mini Map -->
+            <div class="minimap">
+                <div class="minimap-viewport"></div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button class="control-btn" onclick="zoomIn()">+</button>
+                <button class="control-btn" onclick="zoomOut()">−</button>
+                <button class="control-btn" onclick="fitView()">⊡</button>
+                <button class="control-btn" onclick="centerView()">⊙</button>
+            </div>
+
+            <!-- Collaboration Cursors -->
+            <div class="cursor" style="background: #ef4444; top: 250px; left: 450px;">
+                <span class="cursor-label">Marco</span>
+            </div>
+        </div>
+
+        <!-- Timeline View (Hidden by default) -->
+        <div class="timeline-view" id="timelineView">
+            <div class="timeline-day">
+                <div class="timeline-day-header">
+                    <div class="timeline-day-number">1</div>
+                    <div class="timeline-day-info">
+                        <h3>Primo Giorno</h3>
+                        <div class="timeline-day-date">15 Maggio 2024 • Mercoledì</div>
+                    </div>
+                </div>
+                <div class="timeline-items">
+                    <div class="timeline-item">
+                        <div class="timeline-item-time">09:00</div>
+                        <div style="flex: 1;">
+                            <h4>Colosseo</h4>
+                            <p style="color: #999; font-size: 13px; margin-top: 4px;">Tour guidato con accesso prioritario ai sotterranei</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-item-time">13:00</div>
+                        <div style="flex: 1;">
+                            <h4>Trattoria Monti</h4>
+                            <p style="color: #999; font-size: 13px; margin-top: 4px;">Pranzo - Cucina romana tradizionale</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-item-time">15:00</div>
+                        <div style="flex: 1;">
+                            <h4>Foro Romano</h4>
+                            <p style="color: #999; font-size: 13px; margin-top: 4px;">Visita guidata del centro dell'antica Roma</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-day">
+                <div class="timeline-day-header">
+                    <div class="timeline-day-number">2</div>
+                    <div class="timeline-day-info">
+                        <h3>Secondo Giorno</h3>
+                        <div class="timeline-day-date">16 Maggio 2024 • Giovedì</div>
+                    </div>
+                </div>
+                <div class="timeline-items">
+                    <div class="timeline-item">
+                        <div class="timeline-item-time">08:30</div>
+                        <div style="flex: 1;">
+                            <h4>Musei Vaticani</h4>
+                            <p style="color: #999; font-size: 13px; margin-top: 4px;">Ingresso prioritario con audioguida</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Sidebar -->
+        <div class="chat-sidebar" id="chatSidebar">
+            <div class="chat-header">
+                <div class="chat-title">✨ AI Travel Assistant</div>
+                <button class="chat-close" onclick="closeChat()">✕</button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message ai">
+                    <strong>WeScape AI</strong><br>
+                    Sto analizzando il Colosseo. Cosa vorresti sapere o modificare?
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" placeholder="Chiedi qualsiasi cosa..." onkeypress="handleChatInput(event)">
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <script>
+        // Node Management
+        let nodeCount = 4;
+        let isDragging = false;
+        let currentNode = null;
+        let offsetX, offsetY;
+
+        // Initialize draggable nodes
+        document.querySelectorAll('.node').forEach(node => {
+            node.addEventListener('mousedown', startDrag);
+            node.addEventListener('dblclick', () => editNode(node.id));
+        });
+
+        function startDrag(e) {
+            if (e.target.classList.contains('node-action')) return;
+            isDragging = true;
+            currentNode = e.currentTarget;
+            offsetX = e.clientX - currentNode.offsetLeft;
+            offsetY = e.clientY - currentNode.offsetTop;
+            currentNode.style.zIndex = 1000;
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || !currentNode) return;
+            
+            // Snap to grid (30px)
+            const x = Math.round((e.clientX - offsetX) / 30) * 30;
+            const y = Math.round((e.clientY - offsetY) / 30) * 30;
+            
+            currentNode.style.left = x + 'px';
+            currentNode.style.top = y + 'px';
+            
+            // Update connections
+            updateConnections();
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (currentNode) {
+                currentNode.style.zIndex = '';
+                showToast('Node position updated');
+            }
+            isDragging = false;
+            currentNode = null;
+        });
+
+        // Add new node
+        function addNode(type) {
+            nodeCount++;
+            const canvas = document.getElementById('canvasView');
+            const node = document.createElement('div');
+            node.className = `node ${type}`;
+            node.id = `node${nodeCount}`;
+            node.style.top = '200px';
+            node.style.left = `${300 + (nodeCount * 50)}px`;
+            
+            const icons = {
+                destination: '📍',
+                activity: '🎯',
+                restaurant: '🍽️',
+                hotel: '🏨',
+                transport: '🚗'
+            };
+            
+            const titles = {
+                destination: 'Nuova Destinazione',
+                activity: 'Nuova Attività',
+                restaurant: 'Nuovo Ristorante',
+                hotel: 'Nuovo Hotel',
+                transport: 'Nuovo Trasporto'
+            };
+            
+            node.innerHTML = `
+                <div class="node-actions">
+                    <div class="node-action" onclick="editNode('node${nodeCount}')">✏️</div>
+                    <div class="node-action">🗑️</div>
+                </div>
+                <div class="node-header">
+                    <span class="node-icon">${icons[type]}</span>
+                    <span class="node-title">${titles[type]}</span>
+                </div>
+                <div class="node-time">Da definire</div>
+                <div class="node-description">Clicca per modificare</div>
+            `;
+            
+            canvas.appendChild(node);
+            node.addEventListener('mousedown', startDrag);
+            node.addEventListener('dblclick', () => editNode(node.id));
+            
+            showToast(`${titles[type]} aggiunto al canvas`);
+            
+            // Animate entry
+            node.style.transform = 'scale(0)';
+            setTimeout(() => {
+                node.style.transition = 'transform 0.3s ease';
+                node.style.transform = 'scale(1)';
+            }, 10);
+        }
+
+        // Edit node - open chat
+        function editNode(nodeId) {
+            const sidebar = document.getElementById('chatSidebar');
+            sidebar.classList.add('open');
+            
+            const node = document.getElementById(nodeId);
+            const title = node.querySelector('.node-title').textContent;
+            
+            const messages = document.getElementById('chatMessages');
+            messages.innerHTML = `
+                <div class="chat-message ai">
+                    <strong>WeScape AI</strong><br>
+                    Sto analizzando <strong>${title}</strong>. Come posso aiutarti?<br><br>
+                    Posso:<br>
+                    • Trovare informazioni aggiornate<br>
+                    • Suggerire alternative simili<br>
+                    • Ottimizzare gli orari<br>
+                    • Verificare disponibilità e prezzi
+                </div>
+            `;
+        }
+
+        // Chat functionality
+        function handleChatInput(event) {
+            if (event.key === 'Enter') {
+                const input = event.target;
+                const message = input.value.trim();
+                if (!message) return;
+                
+                const messages = document.getElementById('chatMessages');
+                
+                // Add user message
+                const userMsg = document.createElement('div');
+                userMsg.className = 'chat-message user';
+                userMsg.innerHTML = `<strong>Tu</strong><br>${message}`;
+                messages.appendChild(userMsg);
+                
+                // Clear input
+                input.value = '';
+                
+                // Simulate AI response
+                setTimeout(() => {
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'chat-message ai';
+                    aiMsg.innerHTML = `<strong>WeScape AI</strong><br>Ho capito! Sto elaborando la tua richiesta...`;
+                    messages.appendChild(aiMsg);
+                    messages.scrollTop = messages.scrollHeight;
+                    
+                    // Show modification
+                    setTimeout(() => {
+                        showToast('✅ Card aggiornata con successo');
+                    }, 1500);
+                }, 500);
+                
+                messages.scrollTop = messages.scrollHeight;
+            }
+        }
+
+        function closeChat() {
+            document.getElementById('chatSidebar').classList.remove('open');
+        }
+
+        // View switching
+        function switchView(view) {
+            // Update buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.view-btn').classList.add('active');
+            
+            // Switch views
+            document.getElementById('canvasView').style.display = view === 'canvas' ? 'block' : 'none';
+            document.getElementById('timelineView').classList.toggle('active', view === 'timeline');
+            
+            if (view === 'map') {
+                showToast('🗺️ Map view coming soon!');
+            } else if (view === 'budget') {
+                showToast('💰 Budget view coming soon!');
+            }
+        }
+
+        // Auto Layout
+        function autoLayout() {
+            const nodes = document.querySelectorAll('.node');
+            let x = 100;
+            let y = 100;
+            
+            nodes.forEach((node, index) => {
+                node.style.transition = 'all 0.5s ease';
+                node.style.left = x + 'px';
+                node.style.top = y + 'px';
+                
+                x += 300;
+                if ((index + 1) % 3 === 0) {
+                    x = 100;
+                    y += 200;
+                }
+            });
+            
+            setTimeout(() => {
+                nodes.forEach(node => {
+                    node.style.transition = '';
+                });
+                updateConnections();
+            }, 500);
+            
+            showToast('✨ Layout ottimizzato con AI');
+        }
+
+        // Apply AI suggestion
+        function applySuggestion(id) {
+            showToast('💡 Suggerimento applicato al tuo itinerario');
+            
+            // Animate the suggestion card
+            event.target.closest('.suggestion-card').style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => {
+                event.target.closest('.suggestion-card').style.display = 'none';
+            }, 300);
+        }
+
+        // Update connections (simplified)
+        function updateConnections() {
+            // In a real implementation, this would recalculate connection paths
+            console.log('Updating connections...');
+        }
+
+        // Toast notifications
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Zoom controls
+        function zoomIn() {
+            showToast('🔍 Zoom in');
+        }
+
+        function zoomOut() {
+            showToast('🔍 Zoom out');
+        }
+
+        function fitView() {
+            showToast('⊡ Fit to view');
+        }
+
+        function centerView() {
+            showToast('⊙ Centered');
+        }
+
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                to { opacity: 0; transform: scale(0.9); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize
+        window.addEventListener('load', () => {
+            showToast('👋 Benvenuto in WeScape Canvas!');
+        });
+    </script>
+</body>
+</html>

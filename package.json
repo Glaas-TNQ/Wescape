@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@reactflow/background": "^11.3.14",
+    "@reactflow/controls": "^11.2.14",
+    "@reactflow/minimap": "^11.7.14",
+    "framer-motion": "^12.23.12",
+    "reactflow": "^11.11.4",
+    "zustand": "^5.0.7"
+  }
+}
