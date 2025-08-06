@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Handle, Position, NodeResizer, type NodeProps } from 'reactflow';
 import NodeActions from './NodeActions';
+import { getNodeColors } from '../../../utils/nodeColors';
 
 export interface ActivityNodeData {
   title: string;
@@ -8,6 +9,7 @@ export interface ActivityNodeData {
   time?: string;
   duration?: string;
   category?: string;
+  customColor?: string | null;
 }
 
 interface ActivityNodeProps extends NodeProps<ActivityNodeData> {
@@ -17,6 +19,9 @@ interface ActivityNodeProps extends NodeProps<ActivityNodeData> {
 const ActivityNode = ({ data, selected, id }: ActivityNodeProps) => {
   const [isHoveredBorder, setIsHoveredBorder] = useState(false);
   const [isHoveredCenter, setIsHoveredCenter] = useState(false);
+  
+  // Get dynamic colors based on node type and custom color
+  const colors = getNodeColors('activity', data.customColor);
   
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -42,7 +47,7 @@ const ActivityNode = ({ data, selected, id }: ActivityNodeProps) => {
   return (
     <>
       <NodeResizer 
-        color="rgb(6, 182, 212)" 
+        color={colors.resizer}
         isVisible={selected || isHoveredBorder}
         minWidth={180}
         minHeight={100}
@@ -50,26 +55,38 @@ const ActivityNode = ({ data, selected, id }: ActivityNodeProps) => {
           width: '12px',
           height: '12px',
           borderRadius: '3px',
-          backgroundColor: 'rgb(6, 182, 212)',
-          border: '2px solid rgba(6, 182, 212, 0.8)',
+          backgroundColor: colors.base,
+          border: `2px solid rgba(${colors.rgb}, 0.8)`,
         }}
         lineStyle={{
-          borderColor: 'rgb(6, 182, 212)',
+          borderColor: colors.border,
           borderWidth: '2px',
         }}
       />
       <div 
-        className={`
-          w-full h-full p-4 rounded-xl border-2 relative group
-          transition-all duration-300 backdrop-blur-md overflow-hidden
-          ${isHoveredCenter ? 'cursor-move' : 'cursor-default'}
-          ${selected 
-            ? 'border-cyan-400 shadow-2xl shadow-cyan-500/40 ring-4 ring-cyan-400/30 bg-gradient-to-br from-cyan-900/40 to-blue-800/30' 
-            : 'border-cyan-600 hover:border-cyan-400 bg-gradient-to-br from-cyan-900/20 to-blue-800/10 hover:from-cyan-900/30 hover:to-blue-800/20'
+        className="w-full h-full p-4 rounded-xl border-2 relative group transition-all duration-300 backdrop-blur-md overflow-hidden"
+        style={{
+          cursor: isHoveredCenter ? 'move' : 'default',
+          borderColor: selected ? colors.borderSelected : colors.border,
+          backgroundColor: selected ? colors.backgroundSelected : colors.background,
+          boxShadow: selected 
+            ? `0 25px 50px -12px ${colors.shadow}, 0 0 0 4px ${colors.ring}` 
+            : 'none'
+        }}
+        onMouseEnter={(e) => {
+          if (!selected) {
+            e.currentTarget.style.borderColor = colors.borderHover;
+            e.currentTarget.style.backgroundColor = colors.backgroundHover;
           }
-        `}
+        }}
         onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        onMouseLeave={(e) => {
+          handleMouseLeave();
+          if (!selected) {
+            e.currentTarget.style.borderColor = colors.border;
+            e.currentTarget.style.backgroundColor = colors.background;
+          }
+        }}
         onDoubleClick={() => {
           window.dispatchEvent(new CustomEvent('editNode', { detail: { nodeId: id } }));
         }}
@@ -79,25 +96,41 @@ const ActivityNode = ({ data, selected, id }: ActivityNodeProps) => {
         type="target" 
         position={Position.Top} 
         id="top"
-        className="w-4 h-4 !bg-cyan-500 !border-2 !border-cyan-300 hover:!bg-cyan-400 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: colors.handle, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="target" 
         position={Position.Right} 
         id="right"
-        className="w-4 h-4 !bg-cyan-500 !border-2 !border-cyan-300 hover:!bg-cyan-400 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: colors.handle, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="target" 
         position={Position.Bottom} 
         id="bottom"
-        className="w-4 h-4 !bg-cyan-500 !border-2 !border-cyan-300 hover:!bg-cyan-400 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: colors.handle, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="target" 
         position={Position.Left} 
         id="left"
-        className="w-4 h-4 !bg-cyan-500 !border-2 !border-cyan-300 hover:!bg-cyan-400 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: colors.handle, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       
       {/* Source Handles */}
@@ -105,28 +138,58 @@ const ActivityNode = ({ data, selected, id }: ActivityNodeProps) => {
         type="source" 
         position={Position.Top} 
         id="source-top"
-        className="w-4 h-4 !bg-cyan-400 !border-2 !border-cyan-300 hover:!bg-cyan-300 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: `rgba(${colors.rgb}, 0.8)`, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="source" 
         position={Position.Right} 
         id="source-right"
-        className="w-4 h-4 !bg-cyan-400 !border-2 !border-cyan-300 hover:!bg-cyan-300 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: `rgba(${colors.rgb}, 0.8)`, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="source" 
         position={Position.Bottom} 
         id="source-bottom"
-        className="w-4 h-4 !bg-cyan-400 !border-2 !border-cyan-300 hover:!bg-cyan-300 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: `rgba(${colors.rgb}, 0.8)`, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="source" 
         position={Position.Left} 
         id="source-left"
-        className="w-4 h-4 !bg-cyan-400 !border-2 !border-cyan-300 hover:!bg-cyan-300 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: `rgba(${colors.rgb}, 0.8)`, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       
-      <NodeActions nodeId={id} nodeType="Attività" />
+      <NodeActions 
+        nodeId={id} 
+        nodeType="Attività" 
+        currentColor={data.customColor}
+        onColorClick={(position) => {
+          window.dispatchEvent(new CustomEvent('openColorPicker', { 
+            detail: { 
+              nodeId: id, 
+              nodeType: 'activity',
+              currentColor: data.customColor,
+              position 
+            } 
+          }));
+        }}
+      />
       
       <div className="flex items-center gap-2 mb-2 overflow-hidden">
         <span className="text-2xl flex-shrink-0">🎯</span>
@@ -134,7 +197,9 @@ const ActivityNode = ({ data, selected, id }: ActivityNodeProps) => {
       </div>
       
       {data.time && (
-        <p className="text-xs text-cyan-300 mb-1 truncate">{data.time}</p>
+        <p className="text-xs mb-1 truncate" style={{ color: `rgba(${colors.rgb}, 0.8)` }}>
+          {data.time}
+        </p>
       )}
       
       <div className="flex-1 overflow-hidden">
@@ -144,7 +209,13 @@ const ActivityNode = ({ data, selected, id }: ActivityNodeProps) => {
       </div>
       
       {data.duration && (
-        <div className="mt-2 text-xs text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded">
+        <div 
+          className="mt-2 text-xs px-2 py-1 rounded"
+          style={{ 
+            color: `rgba(${colors.rgb}, 0.9)`,
+            backgroundColor: `rgba(${colors.rgb}, 0.1)`
+          }}
+        >
           ⏱️ {data.duration}
         </div>
       )}

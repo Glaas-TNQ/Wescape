@@ -20,6 +20,7 @@ const NodeEditModal: React.FC<NodeEditModalProps> = ({ nodeId, isOpen, onClose }
     }
   }, [node]);
 
+
   if (!isOpen || !node) return null;
 
   const handleSave = () => {
@@ -311,6 +312,48 @@ const NodeEditModal: React.FC<NodeEditModalProps> = ({ nodeId, isOpen, onClose }
           </>
         );
 
+      case 'nestedCanvas':
+        return (
+          <>
+            <FormField
+              label="Titolo Canvas"
+              value={formData.title || ''}
+              onChange={(value) => handleChange('title', value)}
+              placeholder="Es. Dettagli Progetto"
+            />
+            <FormField
+              label="Descrizione"
+              value={formData.description || ''}
+              onChange={(value) => handleChange('description', value)}
+              placeholder="Descrizione del canvas annidato"
+              multiline
+            />
+            <div className="bg-purple-900/20 border border-purple-500/30 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2 text-purple-300">
+                <span className="text-lg">🎨</span>
+                <span className="font-medium">Contenuto Canvas Annidato</span>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="bg-purple-800/20 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-purple-300">
+                    {formData.childNodes?.length || 0}
+                  </div>
+                  <div className="text-purple-400">Elementi</div>
+                </div>
+                <div className="bg-purple-800/20 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-purple-300">
+                    {formData.childEdges?.length || 0}
+                  </div>
+                  <div className="text-purple-400">Connessioni</div>
+                </div>
+              </div>
+              <div className="text-xs text-purple-400 text-center">
+                💡 Fai doppio click sul nodo per aprire il canvas annidato
+              </div>
+            </div>
+          </>
+        );
+
       default:
         return <div>Tipo nodo non supportato</div>;
     }
@@ -445,6 +488,7 @@ const getNodeTypeLabel = (type: NodeType): string => {
     transport: 'Trasporto',
     note: 'Nota',
     dayDivider: 'Divisore Giorno',
+    nestedCanvas: 'Canvas Annidato',
   };
   return labels[type] || 'Nodo';
 };

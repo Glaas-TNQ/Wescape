@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import TripCanvas from './components/canvas/TripCanvas';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
   useEffect(() => {
@@ -7,9 +8,11 @@ function App() {
   }, []);
 
   return (
-    <div className="h-screen w-screen bg-black overflow-hidden">
-      <TripCanvas />
-    </div>
+    <ThemeProvider>
+      <div className="h-screen w-screen overflow-hidden">
+        <TripCanvas />
+      </div>
+    </ThemeProvider>
   );
 }
 

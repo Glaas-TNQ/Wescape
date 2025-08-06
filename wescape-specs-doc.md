@@ -141,14 +141,14 @@ WeScape è una piattaforma di pianificazione viaggi basata su AI che rivoluziona
 - Salvataggio automatico posizioni
 
 **Tasks:**
-- [ ] T-2.1.1: Setup React Flow con TypeScript (3h)
-- [ ] T-2.1.2: Configurare canvas controls (zoom, pan) (2h)
-- [ ] T-2.1.3: Implementare grid background (2h)
-- [ ] T-2.1.4: Aggiungere minimap component (2h)
-- [ ] T-2.1.5: Implementare auto-save posizioni (4h)
-- [ ] T-2.1.6: Ottimizzare performance per 100+ cards (4h)
-- [ ] T-2.1.7: Aggiungere keyboard shortcuts (3h)
-- [ ] T-2.1.8: Implementare undo/redo system (5h)
+- [x] T-2.1.1: Setup React Flow con TypeScript (3h) ✅ **COMPLETATO**
+- [x] T-2.1.2: Configurare canvas controls (zoom, pan) (2h) ✅ **COMPLETATO**
+- [x] T-2.1.3: Implementare grid background (2h) ✅ **COMPLETATO**
+- [x] T-2.1.4: Aggiungere minimap component (2h) ✅ **COMPLETATO**
+- [x] T-2.1.5: Implementare auto-save posizioni (4h) ✅ **COMPLETATO**
+- [x] T-2.1.6: Ottimizzare performance per 100+ cards (4h) ✅ **COMPLETATO**
+- [ ] T-2.1.7: Aggiungere keyboard shortcuts (3h) 🚧 **PARZIALE** (hook presente)
+- [x] T-2.1.8: Implementare undo/redo system (5h) ✅ **COMPLETATO**
 
 #### US-2.2: Card Creation & Types
 **Come** utente  
@@ -162,17 +162,17 @@ WeScape è una piattaforma di pianificazione viaggi basata su AI che rivoluziona
 - Posizionamento intelligente nel canvas
 
 **Tasks:**
-- [ ] T-2.2.1: Definire Card base component (4h)
-- [ ] T-2.2.2: Creare DestinationCard component (3h)
-- [ ] T-2.2.3: Creare ActivityCard component (3h)
-- [ ] T-2.2.4: Creare RestaurantCard component (3h)
-- [ ] T-2.2.5: Creare HotelCard component (3h)
-- [ ] T-2.2.6: Creare TransportCard component (3h)
-- [ ] T-2.2.7: Creare NoteCard component (2h)
-- [ ] T-2.2.8: Implementare card creation toolbar (3h)
-- [ ] T-2.2.9: Aggiungere smart positioning algorithm (4h)
-- [ ] T-2.2.10: Database schema per cards table (2h)
-- [ ] T-2.2.11: API endpoints CRUD per cards (4h)
+- [x] T-2.2.1: Definire Card base component (4h) ✅ **COMPLETATO**
+- [x] T-2.2.2: Creare DestinationCard component (3h) ✅ **COMPLETATO**
+- [x] T-2.2.3: Creare ActivityCard component (3h) ✅ **COMPLETATO**
+- [x] T-2.2.4: Creare RestaurantCard component (3h) ✅ **COMPLETATO**
+- [x] T-2.2.5: Creare HotelCard component (3h) ✅ **COMPLETATO**
+- [x] T-2.2.6: Creare TransportCard component (3h) ✅ **COMPLETATO**
+- [x] T-2.2.7: Creare NoteCard component (2h) ✅ **COMPLETATO**
+- [x] T-2.2.8: Implementare card creation toolbar (3h) ✅ **COMPLETATO**
+- [x] T-2.2.9: Aggiungere smart positioning algorithm (4h) ✅ **COMPLETATO**
+- [x] T-2.2.10: Database schema per cards table (2h) ✅ **COMPLETATO**
+- [ ] T-2.2.11: API endpoints CRUD per cards (4h) ❌ **NON IMPLEMENTATO**
 
 #### US-2.3: Card Connections
 **Come** utente  
@@ -186,13 +186,13 @@ WeScape è una piattaforma di pianificazione viaggi basata su AI che rivoluziona
 - Cancellazione facile connessioni
 
 **Tasks:**
-- [ ] T-2.3.1: Implementare connection drawing (4h)
-- [ ] T-2.3.2: Creare connection types system (3h)
-- [ ] T-2.3.3: Aggiungere arrow markers customizzati (2h)
-- [ ] T-2.3.4: Implementare connection validation (3h)
-- [ ] T-2.3.5: Database schema per connections (2h)
-- [ ] T-2.3.6: API per gestione connections (3h)
-- [ ] T-2.3.7: Animazioni per connections attive (2h)
+- [x] T-2.3.1: Implementare connection drawing (4h) ✅ **COMPLETATO**
+- [x] T-2.3.2: Creare connection types system (3h) ✅ **COMPLETATO**
+- [x] T-2.3.3: Aggiungere arrow markers customizzati (2h) ✅ **COMPLETATO**
+- [x] T-2.3.4: Implementare connection validation (3h) ✅ **COMPLETATO**
+- [x] T-2.3.5: Database schema per connections (2h) ✅ **COMPLETATO**
+- [ ] T-2.3.6: API per gestione connections (3h) ❌ **NON IMPLEMENTATO**
+- [x] T-2.3.7: Animazioni per connections attive (2h) ✅ **COMPLETATO**
 
 ---
 
@@ -284,14 +284,14 @@ WeScape è una piattaforma di pianificazione viaggi basata su AI che rivoluziona
 - Rollback con un click
 
 **Tasks:**
-- [ ] T-4.1.1: Database schema per card_versions (2h)
-- [ ] T-4.1.2: Trigger automatico versioning (3h)
-- [ ] T-4.1.3: Creare VersionTimeline component (5h)
-- [ ] T-4.1.4: Implementare version diff viewer (4h)
-- [ ] T-4.1.5: API endpoint per version history (3h)
-- [ ] T-4.1.6: Implementare rollback functionality (3h)
-- [ ] T-4.1.7: Aggiungere version annotations (2h)
-- [ ] T-4.1.8: Compressione storage vecchie versioni (4h)
+- [x] T-4.1.1: Database schema per card_versions (2h) ✅ **COMPLETATO**
+- [ ] T-4.1.2: Trigger automatico versioning (3h) ❌ **NON IMPLEMENTATO**
+- [ ] T-4.1.3: Creare VersionTimeline component (5h) ❌ **NON IMPLEMENTATO**
+- [ ] T-4.1.4: Implementare version diff viewer (4h) ❌ **NON IMPLEMENTATO**
+- [ ] T-4.1.5: API endpoint per version history (3h) ❌ **NON IMPLEMENTATO**
+- [ ] T-4.1.6: Implementare rollback functionality (3h) ❌ **NON IMPLEMENTATO**
+- [ ] T-4.1.7: Aggiungere version annotations (2h) ❌ **NON IMPLEMENTATO**
+- [ ] T-4.1.8: Compressione storage vecchie versioni (4h) ❌ **NON IMPLEMENTATO**
 
 #### US-4.2: AI vs Human Changes Tracking
 **Come** utente  

@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Handle, Position, NodeResizer, type NodeProps } from 'reactflow';
 import NodeActions from './NodeActions';
+import { getNodeColors } from '../../../utils/nodeColors';
 
 export interface DestinationNodeData {
   title: string;
   description: string;
   date?: string;
   location?: string;
+  customColor?: string | null;
 }
 
 interface DestinationNodeProps extends NodeProps<DestinationNodeData> {
@@ -16,6 +18,9 @@ interface DestinationNodeProps extends NodeProps<DestinationNodeData> {
 const DestinationNode = ({ data, selected, id }: DestinationNodeProps) => {
   const [isHoveredBorder, setIsHoveredBorder] = useState(false);
   const [isHoveredCenter, setIsHoveredCenter] = useState(false);
+  
+  // Get dynamic colors based on node type and custom color
+  const colors = getNodeColors('destination', data.customColor);
   
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -41,7 +46,7 @@ const DestinationNode = ({ data, selected, id }: DestinationNodeProps) => {
   return (
     <>
       <NodeResizer 
-        color="rgb(168, 85, 247)" 
+        color={colors.resizer}
         isVisible={selected || isHoveredBorder}
         minWidth={180}
         minHeight={100}
@@ -49,26 +54,38 @@ const DestinationNode = ({ data, selected, id }: DestinationNodeProps) => {
           width: '12px',
           height: '12px',
           borderRadius: '3px',
-          backgroundColor: 'rgb(168, 85, 247)',
-          border: '2px solid rgba(168, 85, 247, 0.8)',
+          backgroundColor: colors.base,
+          border: `2px solid rgba(${colors.rgb}, 0.8)`,
         }}
         lineStyle={{
-          borderColor: 'rgb(168, 85, 247)',
+          borderColor: colors.border,
           borderWidth: '2px',
         }}
       />
       <div 
-        className={`
-          w-full h-full p-4 rounded-xl border-2 relative group
-          transition-all duration-300 backdrop-blur-md overflow-hidden
-          ${isHoveredCenter ? 'cursor-move' : 'cursor-default'}
-          ${selected 
-            ? 'border-purple-400 shadow-2xl shadow-purple-500/40 ring-4 ring-purple-400/30 bg-gradient-to-br from-purple-900/40 to-purple-800/30' 
-            : 'border-purple-600 hover:border-purple-400 bg-gradient-to-br from-purple-900/20 to-purple-800/10 hover:from-purple-900/30 hover:to-purple-800/20'
+        className="w-full h-full p-4 rounded-xl border-2 relative group transition-all duration-300 backdrop-blur-md overflow-hidden"
+        style={{
+          cursor: isHoveredCenter ? 'move' : 'default',
+          borderColor: selected ? colors.borderSelected : colors.border,
+          backgroundColor: selected ? colors.backgroundSelected : colors.background,
+          boxShadow: selected 
+            ? `0 25px 50px -12px ${colors.shadow}, 0 0 0 4px ${colors.ring}` 
+            : 'none'
+        }}
+        onMouseEnter={(e) => {
+          if (!selected) {
+            e.currentTarget.style.borderColor = colors.borderHover;
+            e.currentTarget.style.backgroundColor = colors.backgroundHover;
           }
-        `}
+        }}
         onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        onMouseLeave={(e) => {
+          handleMouseLeave();
+          if (!selected) {
+            e.currentTarget.style.borderColor = colors.border;
+            e.currentTarget.style.backgroundColor = colors.background;
+          }
+        }}
         onDoubleClick={() => {
           window.dispatchEvent(new CustomEvent('editNode', { detail: { nodeId: id } }));
         }}
@@ -78,25 +95,41 @@ const DestinationNode = ({ data, selected, id }: DestinationNodeProps) => {
         type="target" 
         position={Position.Top} 
         id="top"
-        className="w-4 h-4 !bg-purple-500 !border-2 !border-purple-300 hover:!bg-purple-400 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: colors.handle, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="target" 
         position={Position.Right} 
         id="right"
-        className="w-4 h-4 !bg-purple-500 !border-2 !border-purple-300 hover:!bg-purple-400 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: colors.handle, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="target" 
         position={Position.Bottom} 
         id="bottom"
-        className="w-4 h-4 !bg-purple-500 !border-2 !border-purple-300 hover:!bg-purple-400 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: colors.handle, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="target" 
         position={Position.Left} 
         id="left"
-        className="w-4 h-4 !bg-purple-500 !border-2 !border-purple-300 hover:!bg-purple-400 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: colors.handle, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       
       {/* Source Handles */}
@@ -104,28 +137,58 @@ const DestinationNode = ({ data, selected, id }: DestinationNodeProps) => {
         type="source" 
         position={Position.Top} 
         id="source-top"
-        className="w-4 h-4 !bg-purple-400 !border-2 !border-purple-300 hover:!bg-purple-300 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: `rgba(${colors.rgb}, 0.8)`, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="source" 
         position={Position.Right} 
         id="source-right"
-        className="w-4 h-4 !bg-purple-400 !border-2 !border-purple-300 hover:!bg-purple-300 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: `rgba(${colors.rgb}, 0.8)`, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="source" 
         position={Position.Bottom} 
         id="source-bottom"
-        className="w-4 h-4 !bg-purple-400 !border-2 !border-purple-300 hover:!bg-purple-300 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: `rgba(${colors.rgb}, 0.8)`, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       <Handle 
         type="source" 
         position={Position.Left} 
         id="source-left"
-        className="w-4 h-4 !bg-purple-400 !border-2 !border-purple-300 hover:!bg-purple-300 hover:!scale-125 transition-all duration-200" 
+        className="w-4 h-4 !border-2 hover:!scale-125 transition-all duration-200"
+        style={{ 
+          backgroundColor: `rgba(${colors.rgb}, 0.8)`, 
+          borderColor: `rgba(${colors.rgb}, 0.7)` 
+        }}
       />
       
-      <NodeActions nodeId={id} nodeType="Destinazione" />
+      <NodeActions 
+        nodeId={id} 
+        nodeType="Destinazione" 
+        currentColor={data.customColor}
+        onColorClick={(position) => {
+          window.dispatchEvent(new CustomEvent('openColorPicker', { 
+            detail: { 
+              nodeId: id, 
+              nodeType: 'destination',
+              currentColor: data.customColor,
+              position 
+            } 
+          }));
+        }}
+      />
       
       <div className="flex items-center gap-2 mb-2 overflow-hidden">
         <span className="text-2xl flex-shrink-0">📍</span>
@@ -133,7 +196,9 @@ const DestinationNode = ({ data, selected, id }: DestinationNodeProps) => {
       </div>
       
       {data.date && (
-        <p className="text-xs text-purple-300 mb-1 truncate">{data.date}</p>
+        <p className="text-xs mb-1 truncate" style={{ color: `rgba(${colors.rgb}, 0.8)` }}>
+          {data.date}
+        </p>
       )}
       
       <div className="flex-1 overflow-hidden">

@@ -56,6 +56,20 @@ export const connectionRules: ConnectionRule[] = [
     from: ['dayDivider'],
     to: ['destination', 'activity', 'restaurant', 'hotel', 'dayDivider'],
     description: 'I divisori giorno organizzano il flusso temporale'
+  },
+
+  // Nested canvas can connect to everything for complex structures
+  {
+    from: ['nestedCanvas'],
+    to: ['destination', 'activity', 'restaurant', 'hotel', 'transport', 'note', 'dayDivider', 'nestedCanvas'],
+    description: 'I canvas annidati possono collegare qualsiasi elemento per strutture complesse'
+  },
+
+  // Everything can connect to nested canvas
+  {
+    from: ['destination', 'activity', 'restaurant', 'hotel', 'transport', 'note', 'dayDivider'],
+    to: ['nestedCanvas'],
+    description: 'Tutti gli elementi possono collegare a un canvas annidato'
   }
 ];
 
@@ -136,7 +150,7 @@ export const getConnectionSuggestion = (sourceType: NodeType): string[] => {
 };
 
 const getNodeTypeLabel = (type: NodeType): string => {
-  const labels = {
+  const labels: Record<NodeType, string> = {
     destination: 'Destinazione',
     activity: 'Attività',
     restaurant: 'Ristorante',
@@ -144,6 +158,7 @@ const getNodeTypeLabel = (type: NodeType): string => {
     transport: 'Trasporto',
     note: 'Nota',
     dayDivider: 'Divisore Giorno',
+    nestedCanvas: 'Canvas Annidato',
   };
   return labels[type] || type;
 };

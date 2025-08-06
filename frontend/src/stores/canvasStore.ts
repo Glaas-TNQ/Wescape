@@ -46,12 +46,14 @@ const getDefaultNodeData = (type: NodeType) => {
       title: 'Nuova Destinazione',
       description: 'Clicca per aggiungere dettagli',
       date: '',
+      customColor: null, // null means use default color
     },
     activity: {
       title: 'Nuova Attività',
       description: 'Clicca per aggiungere dettagli',
       time: '',
       duration: '',
+      customColor: null,
     },
     restaurant: {
       title: 'Nuovo Ristorante',
@@ -59,6 +61,7 @@ const getDefaultNodeData = (type: NodeType) => {
       time: '',
       cuisine: '',
       priceRange: '€€',
+      customColor: null,
     },
     hotel: {
       title: 'Nuovo Hotel',
@@ -66,6 +69,7 @@ const getDefaultNodeData = (type: NodeType) => {
       checkIn: '',
       checkOut: '',
       stars: 3,
+      customColor: null,
     },
     transport: {
       title: 'Nuovo Trasporto',
@@ -73,16 +77,27 @@ const getDefaultNodeData = (type: NodeType) => {
       departure: '',
       arrival: '',
       type: 'car' as const,
+      customColor: null,
     },
     note: {
       title: 'Nota',
       content: 'Aggiungi le tue note qui...',
       color: 'yellow' as const,
+      customColor: null,
     },
     dayDivider: {
       day: 1,
       date: new Date().toLocaleDateString('it-IT'),
       title: 'Giorno 1',
+      customColor: null,
+    },
+    nestedCanvas: {
+      title: 'Nuovo Canvas Annidato',
+      description: 'Clicca per aprire il canvas di dettaglio',
+      childNodes: [],
+      childEdges: [],
+      isExpanded: false,
+      customColor: null,
     },
   };
   
@@ -107,6 +122,7 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
         case 'transport': return { width: 220, height: 160 };
         case 'note': return { width: 200, height: 120 };
         case 'dayDivider': return { width: 320, height: 140 };
+        case 'nestedCanvas': return { width: 280, height: 180 };
         default: return { width: 220, height: 140 };
       }
     };
