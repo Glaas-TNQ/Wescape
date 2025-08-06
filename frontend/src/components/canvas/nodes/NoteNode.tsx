@@ -56,25 +56,59 @@ const NoteNode = ({ data, selected, id }: NoteNodeProps) => {
 
   const colors = getColorClasses();
 
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHoveredBorder, setIsHoveredBorder] = useState(false);
+  const [isHoveredCenter, setIsHoveredCenter] = useState(false);
+  
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const borderThreshold = 35; // pixels from edge
+    
+    const isNearBorder = 
+      x < borderThreshold || 
+      y < borderThreshold || 
+      x > rect.width - borderThreshold || 
+      y > rect.height - borderThreshold;
+      
+    setIsHoveredBorder(isNearBorder);
+    setIsHoveredCenter(!isNearBorder);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHoveredBorder(false);
+    setIsHoveredCenter(false);
+  };
   
   return (
     <>
       <NodeResizer 
         color="rgb(234, 179, 8)" 
-        isVisible={selected || isHovered}
+        isVisible={selected || isHoveredBorder}
         minWidth={180}
         minHeight={100}
+        handleStyle={{
+          width: '12px',
+          height: '12px',
+          borderRadius: '3px',
+          backgroundColor: 'rgb(234, 179, 8)',
+          border: '2px solid rgba(234, 179, 8, 0.8)',
+        }}
+        lineStyle={{
+          borderColor: 'rgb(234, 179, 8)',
+          borderWidth: '2px',
+        }}
       />
       <div 
         className={`
-          min-w-[200px] max-w-[300px] p-4 rounded-xl border-2 relative cursor-move group
-          transition-all duration-300 backdrop-blur-md w-full h-full
+          w-full h-full p-4 rounded-xl border-2 relative group
+          transition-all duration-300 backdrop-blur-md overflow-hidden
+          ${isHoveredCenter ? 'cursor-move' : 'cursor-default'}
           ${colors.border}
           bg-gradient-to-br ${colors.bg}
         `}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
         onDoubleClick={() => {
           window.dispatchEvent(new CustomEvent('editNode', { detail: { nodeId: id } }));
         }}

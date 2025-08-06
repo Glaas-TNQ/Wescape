@@ -13,27 +13,61 @@ interface DayDividerNodeProps extends NodeProps<DayDividerNodeData> {
 }
 
 const DayDividerNode = ({ data, selected, id }: DayDividerNodeProps) => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHoveredBorder, setIsHoveredBorder] = useState(false);
+  const [isHoveredCenter, setIsHoveredCenter] = useState(false);
+  
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const borderThreshold = 35; // pixels from edge
+    
+    const isNearBorder = 
+      x < borderThreshold || 
+      y < borderThreshold || 
+      x > rect.width - borderThreshold || 
+      y > rect.height - borderThreshold;
+      
+    setIsHoveredBorder(isNearBorder);
+    setIsHoveredCenter(!isNearBorder);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHoveredBorder(false);
+    setIsHoveredCenter(false);
+  };
   
   return (
     <>
       <NodeResizer 
         color="rgb(99, 102, 241)" 
-        isVisible={selected || isHovered}
+        isVisible={selected || isHoveredBorder}
         minWidth={250}
         minHeight={120}
+        handleStyle={{
+          width: '12px',
+          height: '12px',
+          borderRadius: '3px',
+          backgroundColor: 'rgb(99, 102, 241)',
+          border: '2px solid rgba(99, 102, 241, 0.8)',
+        }}
+        lineStyle={{
+          borderColor: 'rgb(99, 102, 241)',
+          borderWidth: '2px',
+        }}
       />
       <div 
         className={`
-          min-w-[300px] p-6 rounded-xl border-2 relative cursor-move group
-          transition-all duration-300 backdrop-blur-md text-center w-full h-full
+          w-full h-full p-6 rounded-xl border-2 relative group
+          transition-all duration-300 backdrop-blur-md text-center overflow-hidden
+          ${isHoveredCenter ? 'cursor-move' : 'cursor-default'}
           ${selected 
             ? 'border-indigo-400 shadow-2xl shadow-indigo-500/40 ring-4 ring-indigo-400/30 bg-gradient-to-r from-indigo-900/40 to-purple-900/40' 
             : 'border-indigo-600 hover:border-indigo-400 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 hover:from-indigo-900/40 hover:to-purple-900/40'
           }
         `}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
         onDoubleClick={() => {
           window.dispatchEvent(new CustomEvent('editNode', { detail: { nodeId: id } }));
         }}

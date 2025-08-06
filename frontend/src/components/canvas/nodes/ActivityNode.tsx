@@ -15,27 +15,61 @@ interface ActivityNodeProps extends NodeProps<ActivityNodeData> {
 }
 
 const ActivityNode = ({ data, selected, id }: ActivityNodeProps) => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHoveredBorder, setIsHoveredBorder] = useState(false);
+  const [isHoveredCenter, setIsHoveredCenter] = useState(false);
+  
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const borderThreshold = 35; // pixels from edge
+    
+    const isNearBorder = 
+      x < borderThreshold || 
+      y < borderThreshold || 
+      x > rect.width - borderThreshold || 
+      y > rect.height - borderThreshold;
+      
+    setIsHoveredBorder(isNearBorder);
+    setIsHoveredCenter(!isNearBorder);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHoveredBorder(false);
+    setIsHoveredCenter(false);
+  };
   
   return (
     <>
       <NodeResizer 
         color="rgb(6, 182, 212)" 
-        isVisible={selected || isHovered}
+        isVisible={selected || isHoveredBorder}
         minWidth={180}
         minHeight={100}
+        handleStyle={{
+          width: '12px',
+          height: '12px',
+          borderRadius: '3px',
+          backgroundColor: 'rgb(6, 182, 212)',
+          border: '2px solid rgba(6, 182, 212, 0.8)',
+        }}
+        lineStyle={{
+          borderColor: 'rgb(6, 182, 212)',
+          borderWidth: '2px',
+        }}
       />
       <div 
         className={`
-          min-w-[200px] p-4 rounded-xl border-2 relative cursor-move group
-          transition-all duration-300 backdrop-blur-md w-full h-full
+          w-full h-full p-4 rounded-xl border-2 relative group
+          transition-all duration-300 backdrop-blur-md overflow-hidden
+          ${isHoveredCenter ? 'cursor-move' : 'cursor-default'}
           ${selected 
             ? 'border-cyan-400 shadow-2xl shadow-cyan-500/40 ring-4 ring-cyan-400/30 bg-gradient-to-br from-cyan-900/40 to-blue-800/30' 
             : 'border-cyan-600 hover:border-cyan-400 bg-gradient-to-br from-cyan-900/20 to-blue-800/10 hover:from-cyan-900/30 hover:to-blue-800/20'
           }
         `}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
         onDoubleClick={() => {
           window.dispatchEvent(new CustomEvent('editNode', { detail: { nodeId: id } }));
         }}
@@ -94,18 +128,20 @@ const ActivityNode = ({ data, selected, id }: ActivityNodeProps) => {
       
       <NodeActions nodeId={id} nodeType="Attività" />
       
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-2xl">🎯</span>
-        <h3 className="font-bold text-white text-lg">{data.title}</h3>
+      <div className="flex items-center gap-2 mb-2 overflow-hidden">
+        <span className="text-2xl flex-shrink-0">🎯</span>
+        <h3 className="font-bold text-white text-lg truncate">{data.title}</h3>
       </div>
       
       {data.time && (
-        <p className="text-xs text-cyan-300 mb-1">{data.time}</p>
+        <p className="text-xs text-cyan-300 mb-1 truncate">{data.time}</p>
       )}
       
-      <p className="text-sm text-gray-300 leading-relaxed overflow-hidden text-ellipsis line-clamp-3">
-        {data.description}
-      </p>
+      <div className="flex-1 overflow-hidden">
+        <p className="text-sm text-gray-300 leading-relaxed break-words overflow-hidden text-ellipsis line-clamp-3">
+          {data.description}
+        </p>
+      </div>
       
       {data.duration && (
         <div className="mt-2 text-xs text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded">

@@ -97,11 +97,26 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   historyIndex: -1,
   
   addNode: (type: NodeType, position: XYPosition, customData = {}) => {
+    // Dimensioni default per ogni tipo di nodo
+    const getDefaultDimensions = (nodeType: NodeType) => {
+      switch (nodeType) {
+        case 'destination': return { width: 220, height: 140 };
+        case 'activity': return { width: 220, height: 160 };
+        case 'restaurant': return { width: 220, height: 160 };
+        case 'hotel': return { width: 220, height: 180 };
+        case 'transport': return { width: 220, height: 160 };
+        case 'note': return { width: 200, height: 120 };
+        case 'dayDivider': return { width: 320, height: 140 };
+        default: return { width: 220, height: 140 };
+      }
+    };
+    
     const newNode: Node = {
       id: `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type,
       position,
       data: { ...getDefaultNodeData(type), ...customData },
+      ...getDefaultDimensions(type),
     };
     
     set(state => {
