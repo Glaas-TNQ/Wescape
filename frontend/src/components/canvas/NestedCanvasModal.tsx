@@ -23,7 +23,6 @@ import { useCanvasStore } from '../../stores/canvasStore';
 import NestedToolbar from './NestedToolbar';
 import { useToast } from '../../hooks/useToast';
 import ColorPickerOverlay from './ColorPickerOverlay';
-import NodeEditModal from './NodeEditModal';
 
 interface NestedCanvasModalProps {
   isOpen: boolean;

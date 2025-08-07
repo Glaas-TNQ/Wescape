@@ -45,6 +45,8 @@ export const getNodeColors = (nodeType: NodeType, customColor?: string | null) =
       handle: DEFAULT_NODE_COLORS[nodeType],
       resizer: `rgb(${fallbackRgb.r}, ${fallbackRgb.g}, ${fallbackRgb.b})`,
       minimap: DEFAULT_NODE_COLORS[nodeType],
+      secondary: `rgba(${fallbackRgb.r}, ${fallbackRgb.g}, ${fallbackRgb.b}, 0.6)`,
+      textSecondary: `rgba(${fallbackRgb.r}, ${fallbackRgb.g}, ${fallbackRgb.b}, 0.8)`,
     };
   }
 
@@ -62,6 +64,8 @@ export const getNodeColors = (nodeType: NodeType, customColor?: string | null) =
     handle: baseColor,
     resizer: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
     minimap: baseColor,
+    secondary: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`,
+    textSecondary: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.8)`,
   };
 };
 
@@ -77,6 +81,8 @@ const getDefaultColors = () => ({
   backgroundSelected: 'rgba(107, 114, 128, 0.3)',
   shadow: 'rgba(107, 114, 128, 0.4)',
   ring: 'rgba(107, 114, 128, 0.3)',
+  secondary: 'rgba(107, 114, 128, 0.6)',
+  textSecondary: 'rgba(107, 114, 128, 0.8)',
   handle: '#6b7280',
   resizer: 'rgb(107, 114, 128)',
   minimap: '#6b7280',

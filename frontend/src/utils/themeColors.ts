@@ -32,6 +32,12 @@ export interface ThemeColors {
     disabled: string;
   };
   
+  // Surface colors
+  surface: {
+    primary: string;
+    secondary: string;
+  };
+  
   // Node specific
   node: {
     shadow: string;
@@ -65,6 +71,10 @@ export const darkTheme: ThemeColors = {
     active: 'rgba(255, 255, 255, 0.2)',
     disabled: 'rgba(255, 255, 255, 0.05)',
   },
+  surface: {
+    primary: '#1a1a1a',
+    secondary: '#2a2a2a',
+  },
   node: {
     shadow: 'rgba(0, 0, 0, 0.5)',
     handle: 'rgba(255, 255, 255, 0.1)',
@@ -96,6 +106,10 @@ export const lightTheme: ThemeColors = {
     hover: 'rgba(0, 0, 0, 0.05)',
     active: 'rgba(0, 0, 0, 0.1)',
     disabled: 'rgba(0, 0, 0, 0.02)',
+  },
+  surface: {
+    primary: '#ffffff',
+    secondary: '#f9fafb',
   },
   node: {
     shadow: 'rgba(0, 0, 0, 0.15)',

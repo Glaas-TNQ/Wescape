@@ -27,6 +27,10 @@ export interface CanvasStore extends CanvasState {
   // Selection
   setSelectedNodes: (nodeIds: string[]) => void;
   
+  // Direct setters
+  setNodes: (nodes: Node[]) => void;
+  setEdges: (edges: Edge[]) => void;
+  
   // History
   undo: () => void;
   redo: () => void;
@@ -168,8 +172,8 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
               // Preserve original dimensions to prevent auto-resize
               style: {
                 ...node.style,
-                width: node.style?.width || node.width,
-                height: node.style?.height || node.height
+                width: (node.style?.width || node.width) as string | number,
+                height: (node.style?.height || node.height) as string | number
               }
             }
           : node
@@ -224,6 +228,14 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   
   setSelectedNodes: (nodeIds: string[]) => {
     set({ selectedNodes: nodeIds });
+  },
+  
+  setNodes: (nodes: Node[]) => {
+    set({ nodes });
+  },
+  
+  setEdges: (edges: Edge[]) => {
+    set({ edges });
   },
   
   undo: () => {

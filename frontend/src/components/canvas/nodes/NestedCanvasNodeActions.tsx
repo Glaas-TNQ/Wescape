@@ -12,7 +12,7 @@ const NestedCanvasNodeActions: React.FC<NestedCanvasNodeActionsProps> = ({
   nodeId, 
   nodeType, 
   onOpenCanvas,
-  currentColor,
+  currentColor: _currentColor,
   onColorClick
 }) => {
   const [showActions, setShowActions] = useState(false);

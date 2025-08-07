@@ -20,9 +20,7 @@ END $$;
 -- Add tables to publication
 ALTER PUBLICATION supabase_realtime ADD TABLE public.cards;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.connections;
-
--- Optionally add trips if you plan to subscribe to trip changes
--- ALTER PUBLICATION supabase_realtime ADD TABLE public.trips;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.trips;
 
 -- Note:
 -- Row Level Security policies will still apply; realtime will only deliver changes

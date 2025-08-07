@@ -9,7 +9,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS public.cards (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   trip_id UUID NOT NULL REFERENCES public.trips(id) ON DELETE CASCADE,
-  type TEXT NOT NULL CHECK (type IN ('destination', 'activity', 'restaurant', 'hotel', 'transport', 'note')),
+  type TEXT NOT NULL CHECK (type IN ('destination', 'activity', 'restaurant', 'hotel', 'transport', 'note', 'dayDivider', 'nestedCanvas')),
   title TEXT NOT NULL,
   content JSONB NOT NULL DEFAULT '{}'::jsonb,
   position JSONB NOT NULL DEFAULT '{"x": 0, "y": 0}'::jsonb,

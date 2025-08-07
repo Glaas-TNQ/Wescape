@@ -7,7 +7,7 @@ interface NodeActionsProps {
   onColorClick?: (position: { x: number; y: number }) => void;
 }
 
-const NodeActions: React.FC<NodeActionsProps> = ({ nodeId, nodeType, currentColor, onColorClick }) => {
+const NodeActions: React.FC<NodeActionsProps> = ({ nodeId, nodeType, currentColor: _currentColor, onColorClick }) => {
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     window.dispatchEvent(new CustomEvent('editNode', { detail: { nodeId } }));

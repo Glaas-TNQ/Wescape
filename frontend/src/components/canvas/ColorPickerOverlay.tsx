@@ -15,7 +15,7 @@ interface ColorPickerOverlayProps {
 
 const ColorPickerOverlay: React.FC<ColorPickerOverlayProps> = ({
   isOpen,
-  nodeId,
+  nodeId: _nodeId,
   nodeType,
   currentColor,
   position,
