@@ -205,14 +205,14 @@ const NestedCanvasNode = ({ data, selected, id }: NestedCanvasNodeProps) => {
           <h3 className="font-bold text-white text-lg truncate">{data.title}</h3>
         </div>
         
-        <div className="flex-1 overflow-hidden mb-3">
-          <p className="text-sm text-gray-300 leading-relaxed break-words overflow-hidden text-ellipsis line-clamp-2">
+        <div className="flex-1 flex flex-col overflow-hidden mb-3">
+          <p className="text-sm text-gray-300 leading-relaxed break-words flex-1 overflow-y-auto">
             {data.description}
           </p>
         </div>
 
         {/* Preview area showing nested elements count */}
-        <div className="mt-auto space-y-2">
+        <div className="mt-auto space-y-2 flex-shrink-0">
           <div 
             className="flex items-center justify-between text-xs px-3 py-2 rounded-lg"
             style={{

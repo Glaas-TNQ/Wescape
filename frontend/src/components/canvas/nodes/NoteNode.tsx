@@ -194,7 +194,7 @@ const NoteNode = ({ data, selected, id }: NoteNodeProps) => {
         <h3 className="font-bold text-white text-lg">{data.title}</h3>
       </div>
       
-      <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap overflow-hidden text-ellipsis line-clamp-4">
+      <div className="flex-1 text-sm text-gray-300 leading-relaxed whitespace-pre-wrap overflow-y-auto">
         {data.content}
       </div>
       

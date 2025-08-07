@@ -202,7 +202,7 @@ const DestinationNode = ({ data, selected, id }: DestinationNodeProps) => {
       )}
       
       <div className="flex-1 overflow-hidden">
-        <p className="text-sm text-gray-300 leading-relaxed break-words overflow-hidden text-ellipsis line-clamp-3">
+        <p className="text-sm text-gray-300 leading-relaxed break-words overflow-y-auto h-full">
           {data.description}
         </p>
       </div>

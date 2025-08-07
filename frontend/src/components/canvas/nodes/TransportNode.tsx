@@ -208,12 +208,13 @@ const TransportNode = ({ data, selected, id }: TransportNodeProps) => {
         <h3 className="font-bold text-white text-lg truncate">{data.title}</h3>
       </div>
       
-      <div className="text-xs mb-2 space-y-1 overflow-hidden" style={{ color: colors.textSecondary }}>
+      {/* Transport specific info between title and description */}
+      <div className="text-xs mb-2 space-y-1 overflow-hidden flex-shrink-0" style={{ color: colors.textSecondary }}>
         {data.departure && (
-          <div className="truncate">Partenza: {data.departure}</div>
+          <div className="truncate">🛩️ Partenza: {data.departure}</div>
         )}
         {data.arrival && (
-          <div className="truncate">Arrivo: {data.arrival}</div>
+          <div className="truncate">🎩 Arrivo: {data.arrival}</div>
         )}
         {data.duration && (
           <div className="flex items-center gap-1 truncate">
@@ -224,7 +225,7 @@ const TransportNode = ({ data, selected, id }: TransportNodeProps) => {
       </div>
       
       <div className="flex-1 overflow-hidden">
-        <p className="text-sm text-gray-300 leading-relaxed break-words overflow-hidden text-ellipsis line-clamp-3">
+        <p className="text-sm text-gray-300 leading-relaxed break-words overflow-y-auto h-full">
           {data.description}
         </p>
       </div>

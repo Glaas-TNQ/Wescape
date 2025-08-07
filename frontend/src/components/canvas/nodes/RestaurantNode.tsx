@@ -197,41 +197,43 @@ const RestaurantNode = ({ data, selected, id }: RestaurantNodeProps) => {
         <h3 className="font-bold text-white text-lg truncate">{data.title}</h3>
       </div>
       
-      {data.time && (
-        <p className="text-xs mb-1 truncate" style={{ color: `rgba(${colors.rgb}, 0.8)` }}>
-          {data.time}
-        </p>
-      )}
-      
-      <div className="flex-1 overflow-hidden">
-        <p className="text-sm text-gray-300 leading-relaxed break-words overflow-hidden text-ellipsis line-clamp-3">
-          {data.description}
-        </p>
+      {/* Restaurant specific info between title and description */}
+      <div className="mb-2 space-y-2 flex-shrink-0">
+        {data.time && (
+          <p className="text-xs truncate" style={{ color: `rgba(${colors.rgb}, 0.8)` }}>
+            🕰️ {data.time}
+          </p>
+        )}
+        <div className="flex gap-2 flex-wrap">
+          {data.cuisine && (
+            <span 
+              className="text-xs px-2 py-1 rounded"
+              style={{ 
+                backgroundColor: `rgba(${colors.rgb}, 0.1)`,
+                color: `rgba(${colors.rgb}, 0.9)`
+              }}
+            >
+              {data.cuisine}
+            </span>
+          )}
+          {data.priceRange && (
+            <span 
+              className="text-xs px-2 py-1 rounded"
+              style={{ 
+                backgroundColor: `rgba(${colors.rgb}, 0.1)`,
+                color: `rgba(${colors.rgb}, 0.9)`
+              }}
+            >
+              💰 {data.priceRange}
+            </span>
+          )}
+        </div>
       </div>
       
-      <div className="flex gap-2 mt-2">
-        {data.cuisine && (
-          <span 
-            className="text-xs px-2 py-1 rounded"
-            style={{ 
-              backgroundColor: `rgba(${colors.rgb}, 0.1)`,
-              color: `rgba(${colors.rgb}, 0.9)`
-            }}
-          >
-            {data.cuisine}
-          </span>
-        )}
-        {data.priceRange && (
-          <span 
-            className="text-xs px-2 py-1 rounded"
-            style={{ 
-              backgroundColor: `rgba(${colors.rgb}, 0.1)`,
-              color: `rgba(${colors.rgb}, 0.9)`
-            }}
-          >
-            {data.priceRange}
-          </span>
-        )}
+      <div className="flex-1 overflow-hidden">
+        <p className="text-sm text-gray-300 leading-relaxed break-words overflow-y-auto h-full">
+          {data.description}
+        </p>
       </div>
       
       </div>

@@ -197,27 +197,29 @@ const HotelNode = ({ data, selected, id }: HotelNodeProps) => {
         <h3 className="font-bold text-white text-lg truncate">{data.title}</h3>
       </div>
       
-      <div className="text-xs mb-2 space-y-1 overflow-hidden" style={{ color: colors.textSecondary }}>
-        {data.checkIn && (
-          <div className="truncate">Check-in: {data.checkIn}</div>
+      {/* Hotel specific info between title and description */}
+      <div className="mb-2 space-y-1 flex-shrink-0">
+        {data.stars && (
+          <div className="flex items-center gap-1">
+            {'⭐'.repeat(data.stars)}
+            <span className="text-xs ml-1" style={{ color: colors.textSecondary }}>{data.stars} stelle</span>
+          </div>
         )}
-        {data.checkOut && (
-          <div className="truncate">Check-out: {data.checkOut}</div>
-        )}
+        <div className="text-xs space-y-1 overflow-hidden" style={{ color: colors.textSecondary }}>
+          {data.checkIn && (
+            <div className="truncate">Check-in: {data.checkIn}</div>
+          )}
+          {data.checkOut && (
+            <div className="truncate">Check-out: {data.checkOut}</div>
+          )}
+        </div>
       </div>
       
       <div className="flex-1 overflow-hidden">
-        <p className="text-sm text-gray-300 leading-relaxed break-words overflow-hidden text-ellipsis line-clamp-3">
+        <p className="text-sm text-gray-300 leading-relaxed break-words overflow-y-auto h-full">
           {data.description}
         </p>
       </div>
-      
-      {data.stars && (
-        <div className="mt-2 flex items-center gap-1">
-          {'⭐'.repeat(data.stars)}
-          <span className="text-xs ml-1" style={{ color: colors.textSecondary }}>{data.stars} stelle</span>
-        </div>
-      )}
       
       </div>
     </>

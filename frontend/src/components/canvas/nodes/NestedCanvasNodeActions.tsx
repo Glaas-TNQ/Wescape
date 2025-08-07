@@ -41,7 +41,7 @@ const NestedCanvasNodeActions: React.FC<NestedCanvasNodeActionsProps> = ({
 
   return (
     <div
-      className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
+      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
@@ -50,7 +50,7 @@ const NestedCanvasNodeActions: React.FC<NestedCanvasNodeActionsProps> = ({
         {onColorClick && (
           <button 
             onClick={handleColorClick}
-            className="w-8 h-8 bg-gray-900/90 hover:bg-purple-600 rounded-full border border-white/20 flex items-center justify-center text-sm transition-all hover:scale-110 shadow-lg backdrop-blur-sm"
+            className="w-7 h-7 bg-gray-900/90 hover:bg-purple-600 rounded-lg border border-white/20 flex items-center justify-center text-xs transition-all hover:scale-110 shadow-lg backdrop-blur-sm"
             title="Cambia colore"
           >
             🎨
@@ -60,7 +60,7 @@ const NestedCanvasNodeActions: React.FC<NestedCanvasNodeActionsProps> = ({
         {/* Edit button - opens nested canvas instead of edit modal */}
         <button
           onClick={handleEdit}
-          className="w-8 h-8 bg-purple-600/90 hover:bg-purple-500 border border-purple-400/50 rounded-lg text-white flex items-center justify-center text-sm transition-all duration-200 hover:scale-110 shadow-lg"
+          className="w-7 h-7 bg-purple-600/90 hover:bg-purple-500 border border-purple-400/50 rounded-lg text-white flex items-center justify-center text-xs transition-all duration-200 hover:scale-110 shadow-lg"
           title="Apri Canvas Annidato"
         >
           🖼️
@@ -69,7 +69,7 @@ const NestedCanvasNodeActions: React.FC<NestedCanvasNodeActionsProps> = ({
         {/* Delete button */}
         <button
           onClick={handleDelete}
-          className="w-8 h-8 bg-red-600/90 hover:bg-red-500 border border-red-400/50 rounded-lg text-white flex items-center justify-center text-sm transition-all duration-200 hover:scale-110 shadow-lg"
+          className="w-7 h-7 bg-red-600/90 hover:bg-red-500 border border-red-400/50 rounded-lg text-white flex items-center justify-center text-xs transition-all duration-200 hover:scale-110 shadow-lg"
           title="Elimina Nodo"
         >
           🗑️

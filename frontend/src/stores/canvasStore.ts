@@ -114,17 +114,23 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   addNode: (type: NodeType, position: XYPosition, customData = {}) => {
     // Dimensioni default per ogni tipo di nodo
     const getDefaultDimensions = (nodeType: NodeType) => {
-      switch (nodeType) {
-        case 'destination': return { width: 220, height: 140 };
-        case 'activity': return { width: 220, height: 160 };
-        case 'restaurant': return { width: 220, height: 160 };
-        case 'hotel': return { width: 220, height: 180 };
-        case 'transport': return { width: 220, height: 160 };
-        case 'note': return { width: 200, height: 120 };
-        case 'dayDivider': return { width: 320, height: 140 };
-        case 'nestedCanvas': return { width: 280, height: 180 };
-        default: return { width: 220, height: 140 };
-      }
+      const dimensions = {
+        'destination': { width: 220, height: 140 },
+        'activity': { width: 220, height: 160 },
+        'restaurant': { width: 220, height: 160 },
+        'hotel': { width: 220, height: 180 },
+        'transport': { width: 220, height: 160 },
+        'note': { width: 200, height: 120 },
+        'dayDivider': { width: 320, height: 140 },
+        'nestedCanvas': { width: 280, height: 180 }
+      };
+      
+      const { width, height } = dimensions[nodeType] || { width: 220, height: 140 };
+      return {
+        width,
+        height,
+        style: { width: `${width}px`, height: `${height}px` }
+      };
     };
     
     const newNode: Node = {
@@ -156,7 +162,16 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
     set(state => ({
       nodes: state.nodes.map(node => 
         node.id === id 
-          ? { ...node, data: { ...node.data, ...data } }
+          ? { 
+              ...node, 
+              data: { ...node.data, ...data },
+              // Preserve original dimensions to prevent auto-resize
+              style: {
+                ...node.style,
+                width: node.style?.width || node.width,
+                height: node.style?.height || node.height
+              }
+            }
           : node
       ),
     }));

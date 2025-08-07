@@ -246,6 +246,8 @@ const TripCanvas = () => {
           nodesConnectable={true}
           nodesDraggable={true}
           elementsSelectable={true}
+          nodeExtent={undefined}
+          nodesConnectable={true}
         >
           {/* Background with dots pattern */}
           <Background 
