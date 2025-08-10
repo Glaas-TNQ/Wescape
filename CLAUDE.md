@@ -2,7 +2,49 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## General Instructions for All AI Models
+## Important Development Commands
+
+### Windows-Specific Setup
+Since this project runs on Windows, use these commands:
+
+#### Python Virtual Environment (Backend)
+```bash
+# Create virtual environment
+python -m venv venv
+# Activate (Windows Command Prompt)
+venv\Scripts\activate
+# Activate (PowerShell)
+venv\Scripts\Activate.ps1
+# Install dependencies
+pip install -r requirements.txt
+```
+
+#### Development Server Commands
+```bash
+# Backend (from backend/ directory)
+uvicorn app.main:app --reload
+
+# Frontend (from frontend/ directory)
+npm run dev          # Development server (Vite)
+npm run build        # Build for production
+npm run lint         # Run ESLint
+npm run preview      # Preview production build
+```
+
+#### Testing Commands
+```bash
+# Frontend tests (when implemented)
+cd frontend
+npm test                    # Run tests
+npm run test:watch          # Watch mode
+npm run test:coverage       # Coverage report
+
+# Backend tests (when implemented)
+cd backend
+pytest tests/ -v --cov=app # Run tests with coverage
+```
+
+## Development Workflow Requirements
 
 ### DevJournal.md Management
 **MANDATORY**: Before starting any development task, follow this workflow:
@@ -55,6 +97,95 @@ Brief explanation of the approach and decisions made.
 3. Document everything in DevJournal.md for human operator visibility
 4. Focus on atomic, well-defined tasks
 5. Update DevJournal.md immediately after task completion
+
+## Code Development Rules
+
+### Windows Environment Considerations
+- When writing terminal commands, consider that the user is on a Windows machine
+- Use tools (Read, Edit, Write) before suggesting terminal commands
+- Use backslashes for file paths when appropriate
+
+### Testing & TDD Requirements
+- **TDD First**: Always write a failing test before implementation (Red-Green-Refactor)
+- **Test Fixtures**: Use `tests/fixtures/` for test data
+- **Coverage**: >90% preferable, focus on functional coverage of business rules
+- **Supabase Testing**: Integration tests will run on Supabase Cloud environment
+
+### Sequential Thinking
+When asked to think through complex problems, use the "sequentialthinking" MCP server if available. If not available, inform the user that the sequentialthinking MCP server is not accessible.
+
+## Python-Specific Rules (FastAPI + Supabase)
+
+### Environment & Dependencies
+- **Virtual Environments**: Always use a virtual environment (`venv`) for Python projects
+- **Dependencies**: Install and manage within the virtual environment
+- **Type Hints**: Mandatory for all functions and methods
+- **Docstrings**: Required for classes, methods, and functions
+- **Async/Await**: Mandatory for all I/O operations
+
+### FastAPI Patterns
+```python
+# Standard FastAPI endpoint pattern
+from fastapi import APIRouter, Depends, HTTPException
+from app.core.supabase import get_supabase_client
+from app.models.schemas import CreateModel, ResponseModel
+
+router = APIRouter()
+
+@router.post("/", response_model=ResponseModel)
+async def create_item(
+    item: CreateModel,
+    supabase = Depends(get_supabase_client),
+    current_user = Depends(get_current_user)
+):
+    try:
+        result = await supabase.table("items").insert(item.dict()).execute()
+        return ResponseModel(**result.data[0])
+    except Exception as e:
+        logger.error(f"Error creating item: {e}")
+        raise HTTPException(status_code=400, detail="Creation failed")
+```
+
+### Supabase Integration Patterns
+- **RLS**: Always enable Row Level Security, test policies in development
+- **Error Handling**: Transform Supabase errors into HTTPException
+- **Background Tasks**: Use FastAPI BackgroundTasks for async operations
+- **Client Usage**: Always use async Supabase client with proper error handling
+
+## Frontend Development Rules (React + TypeScript + Vite)
+
+### React Patterns
+- **React 18**: With TypeScript mandatory
+- **Functional Components**: Use hooks, no class components
+- **Folder by Feature**: Organize by functionality, not by type
+- **Error Boundaries**: Global error handling
+- **Loading States**: Skeleton UI for async operations
+
+### State Management
+- **Zustand**: For global state management
+- **React Query**: For server state and caching
+- **Optimistic Updates**: For better UX
+- **Type Safety**: Generate types from Supabase schema
+
+### Supabase Frontend Integration
+```typescript
+// hooks/useSupabase.ts pattern
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
+
+export const useTrips = () => {
+  return useQuery({
+    queryKey: ['trips'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trips')
+        .select('*');
+      if (error) throw error;
+      return data;
+    }
+  });
+};
+```
 
 ## Project Overview
 
@@ -111,6 +242,12 @@ uvicorn app.main:app --reload
 
 ### Root Level Commands
 The root `package.json` contains dependencies for shared libraries used across the project (React Flow, Framer Motion, Zustand).
+
+### Database Management
+SQL migration files are managed manually in `backend/sql/`:
+- Files are numbered sequentially (01_, 02_, etc.)
+- Apply migrations manually to Supabase via SQL editor
+- Create new migration files when schema changes are needed
 
 ## Core Canvas System
 
@@ -250,3 +387,20 @@ Based on the specs document, focus areas include:
 4. **AI Features**: Integrate n8n workflows for intelligent suggestions
 5. **Real-time Collaboration**: Enable multi-user canvas editing
 6. **Mobile Experience**: Enhance responsive design and PWA features
+
+## Important Development Notes
+
+### File Operations
+- **NEVER create files unless absolutely necessary** for achieving your goal
+- **ALWAYS prefer editing** an existing file to creating a new one
+- **NEVER proactively create documentation files** (*.md) or README files unless explicitly requested
+
+### Agent System Integration
+- Check for specialized agents in `.claude/agents/` directory
+- Evaluate if task should be delegated to specialized agent before proceeding
+- Follow DevJournal.md workflow for all development tasks
+
+### Architecture References
+- See `AGENTS.md` for detailed testing rules and development patterns
+- See `backend-architecture-guide.md` for comprehensive backend implementation roadmap
+- Follow established patterns in existing codebase

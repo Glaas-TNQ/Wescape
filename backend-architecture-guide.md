@@ -19,7 +19,8 @@ WeScape è una piattaforma di pianificazione viaggi basata su AI che rivoluziona
 - **API Framework:** FastAPI (Python 3.11+)
 - **Database & Auth:** Supabase (PostgreSQL + Auth + Realtime + Storage)
 - **Workflow Engine:** n8n (self-hosted per orchestrazione AI)
-- **ORM:** SQLAlchemy + Alembic per migrazioni
+- **Data Access:** Supabase Client (`supabase-py`)
+- **Migrations:** Raw SQL scripts in `backend/sql/`
 - **Background Jobs:** Celery + Redis
 - **Caching:** Redis per performance
 - **Monitoring:** Sentry + Prometheus + Grafana
@@ -56,7 +57,7 @@ backend/
 │   │   ├── security.py           # Auth & JWT handling  
 │   │   ├── supabase.py          # Supabase client setup
 │   │   ├── n8n_client.py        # n8n integration client
-│   │   └── database.py          # Database connection & session
+│   │   └── database.py          # Deprecated - Supabase client in supabase.py
 │   ├── api/
 │   │   └── v1/
 │   │       ├── auth.py          # Authentication endpoints
@@ -95,7 +96,7 @@ backend/
 │       ├── realtime.py          # WebSocket utilities
 │       ├── performance.py       # Performance optimization
 │       └── security.py          # Security helpers
-├── alembic/                     # Database migrations
+├── sql/                         # Raw SQL migrations (managed by Supabase CLI)
 ├── tests/
 │   ├── unit/                    # Unit tests
 │   ├── integration/             # Integration tests
@@ -125,7 +126,7 @@ backend/
 ### 1.1 Environment Setup
 - [ ] **T-BE-1.1.1:** Setup FastAPI project structure (4h)
   - [ ] Configurare virtual environment Python 3.11+
-  - [ ] Installare FastAPI, SQLAlchemy, Alembic, Pydantic
+  - [ ] Installare FastAPI, supabase-py, Pydantic
   - [ ] Creare struttura directory secondo schema sopra
   - [ ] Setup basic FastAPI app in `main.py`
   - [ ] Configurare CORS e middleware base
@@ -137,12 +138,11 @@ backend/
   - [ ] Testare connessione database
   - [ ] Configurare connection pooling
 
-- [ ] **T-BE-1.1.3:** Setup SQLAlchemy + Alembic (3h)
-  - [ ] Configurare SQLAlchemy async engine
-  - [ ] Setup Alembic per migrations
-  - [ ] Creare base model class con timestamp fields
-  - [ ] Configurare database session dependency
-  - [ ] Creare first migration
+- [ ] **T-BE-1.1.3:** Define Supabase Client access patterns (3h)
+  - [ ] Creare `get_supabase_client` dependency per FastAPI.
+  - [ ] Definire pattern per query (select, insert, update, delete).
+  - [ ] Documentare la gestione degli errori e delle eccezioni.
+  - [ ] Stabilire best practice per l'uso del client asincrono.
 
 - [ ] **T-BE-1.1.4:** Configure Pydantic models (4h)
   - [ ] Creare base schemas con validation
@@ -202,15 +202,14 @@ backend/
   - [ ] Setup foreign key relationships
   - [ ] Testare migrations up/down
 
-- [ ] **T-BE-1.3.2:** Implement base repository pattern (4h)
-  - [ ] Creare BaseRepository class
-  - [ ] Implementare CRUD operations generic
-  - [ ] Aggiungere query optimization
-  - [ ] Setup transaction management
-  - [ ] Creare repository per ogni model
+- [ ] **T-BE-1.3.2:** Establish SQL Migration Workflow (4h)
+  - [ ] Documentare il processo di creazione e applicazione di script SQL.
+  - [ ] Definire una convenzione di denominazione per i file di migrazione.
+  - [ ] Creare uno script di utility per applicare le migrazioni in ordine.
+  - [ ] Integrare il processo di migrazione nel workflow di sviluppo e CI.
 
 - [ ] **T-BE-1.3.3:** Setup connection pooling (2h)
-  - [ ] Configurare SQLAlchemy pool size
+  - [ ] Configurare il connection pool del client Supabase
   - [ ] Setup connection timeout settings
   - [ ] Monitorare connection usage
   - [ ] Implementare health checks

@@ -2,6 +2,10 @@
 
 When writing terminal commands, consider that the user is on a Windows machine 
 When writing lines on a file, or creating a file, always use the tools at your disposal, before suggesting to use a terminal comand
+
+Also, when asked to think, use "sequentialthinking" MCP server if you have access to it, if you don't, let the user know that you do not have access to the "sequentialthinking" MCP server
+
+Whenever you are tasked with something, write an entry in DevJournal.md if the file exists, if the file does not exists create it and then write into it. You need to journal the task you completed or tried to complete, what you did in order to complete it and the relevant files where you operated, log also the timestamp of when yuu worked 
 ## 🧪 Testing & TDD
 - **TDD First**: scrivi sempre un test che fallisce prima dell'implementazione (Red-Green-Refactor)
 - **Test Fixtures**: usa `tests/fixtures/` per dati di test
