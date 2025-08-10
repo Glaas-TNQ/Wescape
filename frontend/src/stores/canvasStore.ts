@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges, type Node, type Edge, type Connection, type NodeChange, type EdgeChange, type XYPosition } from 'reactflow';
 import { type NodeType } from '../components/canvas/nodes';
+import { supabase } from '../lib/supabase';
 
 export interface CanvasState {
   nodes: Node[];
@@ -11,6 +12,7 @@ export interface CanvasStore extends CanvasState {
   selectedNodes: string[];
   history: CanvasState[];
   historyIndex: number;
+  currentTripId: string | null;
   
   // Node operations
   addNode: (type: NodeType, position: XYPosition, data?: any) => void;
@@ -31,6 +33,11 @@ export interface CanvasStore extends CanvasState {
   undo: () => void;
   redo: () => void;
   saveToHistory: () => void;
+  
+  // Trip Persistence
+  loadTripCanvas: (tripId: string) => Promise<void>;
+  saveTripCanvas: (tripId: string) => Promise<void>;
+  setCurrentTrip: (tripId: string | null) => void;
   
   // Utility
   fitView: () => void;
@@ -104,12 +111,13 @@ const getDefaultNodeData = (type: NodeType) => {
   return defaults[type] || {};
 };
 
-export const useCanvasStore = create<CanvasStore>((set) => ({
+export const useCanvasStore = create<CanvasStore>((set, get) => ({
   nodes: [],
   edges: [],
   selectedNodes: [],
   history: [],
   historyIndex: -1,
+  currentTripId: null,
   
   addNode: (type: NodeType, position: XYPosition, customData = {}) => {
     // Dimensioni default per ogni tipo di nodo
@@ -270,6 +278,84 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
         historyIndex: newHistory.length - 1,
       };
     });
+  },
+
+  loadTripCanvas: async (tripId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('trips')
+        .select('canvas_data')
+        .eq('id', tripId)
+        .single();
+
+      if (error) {
+        console.error('Error loading trip canvas:', error);
+        return;
+      }
+
+      const canvasData = data?.canvas_data;
+      if (canvasData && typeof canvasData === 'object' && canvasData.nodes && canvasData.edges) {
+        set(state => ({
+          ...state,
+          nodes: canvasData.nodes,
+          edges: canvasData.edges,
+          selectedNodes: [],
+          currentTripId: tripId,
+          // Reset history with loaded state
+          history: [{ nodes: canvasData.nodes, edges: canvasData.edges }],
+          historyIndex: 0,
+        }));
+      } else {
+        // No canvas data exists, start with empty canvas
+        set(state => ({
+          ...state,
+          nodes: [],
+          edges: [],
+          selectedNodes: [],
+          currentTripId: tripId,
+          history: [{ nodes: [], edges: [] }],
+          historyIndex: 0,
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading trip canvas:', error);
+    }
+  },
+
+  saveTripCanvas: async (tripId: string) => {
+    try {
+      const state = get();
+      const canvasData = {
+        nodes: state.nodes,
+        edges: state.edges,
+        lastModified: new Date().toISOString(),
+      };
+
+      const { error } = await supabase
+        .from('trips')
+        .update({
+          canvas_data: canvasData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', tripId);
+
+      if (error) {
+        console.error('Error saving trip canvas:', error);
+        throw error;
+      }
+
+      console.log('Canvas saved successfully for trip:', tripId);
+    } catch (error) {
+      console.error('Error saving trip canvas:', error);
+      throw error;
+    }
+  },
+
+  setCurrentTrip: (tripId: string | null) => {
+    set(state => ({
+      ...state,
+      currentTripId: tripId,
+    }));
   },
   
   fitView: () => {

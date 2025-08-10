@@ -3,60 +3,49 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTrips } from '../hooks/useTrips';
 import type { Trip } from '../hooks/useTrips';
+import { useCanvasStore } from '../stores/canvasStore';
 import ThemeToggle from './ui/ThemeToggle';
 import TripsList from './dashboard/TripsList';
 import CreateTripModal from './dashboard/CreateTripModal';
+import EditTripModal from './dashboard/EditTripModal';
+import DeleteTripConfirmation from './dashboard/DeleteTripConfirmation';
 import TripCanvas from './canvas/TripCanvas';
 
 const Dashboard: React.FC = () => {
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingTrip, setDeletingTrip] = useState<Trip | null>(null);
   const [createLoading, setCreateLoading] = useState(false);
 
   const { user, signOut } = useAuth();
   const { isDark } = useTheme();
-  const { trips, loading, createTrip } = useTrips();
-  
-  // Mock data for testing (when no trips exist)
-  const mockTrips: Trip[] = user ? [
-    {
-      id: 'mock-1',
-      user_id: user.id,
-      name: 'Viaggio in Giappone',
-      description: 'Un\'avventura di 2 settimane tra Tokyo, Kyoto e Osaka',
-      created_at: '2024-01-15T10:00:00Z',
-      updated_at: '2024-01-20T15:30:00Z',
-    },
-    {
-      id: 'mock-2', 
-      user_id: user.id,
-      name: 'Weekend a Parigi',
-      description: 'Escapade romantica nella città dell\'amore',
-      created_at: '2024-02-01T09:00:00Z',
-      updated_at: '2024-02-01T09:00:00Z',
-    },
-    {
-      id: 'mock-3',
-      user_id: user.id,
-      name: 'Trekking in Patagonia',
-      description: null,
-      created_at: '2024-03-10T14:00:00Z',
-      updated_at: '2024-03-12T11:00:00Z',
-    }
-  ] : [];
-
-  const displayTrips = trips.length > 0 ? trips : mockTrips;
+  const { trips, loading, createTrip, updateTrip, deleteTrip } = useTrips();
+  const { loadTripCanvas, saveTripCanvas, setCurrentTrip } = useCanvasStore();
 
   const handleSignOut = async () => {
     await signOut();
   };
 
-  const handleTripClick = (trip: Trip) => {
+  const handleTripClick = async (trip: Trip) => {
     setSelectedTrip(trip);
+    setCurrentTrip(trip.id);
+    await loadTripCanvas(trip.id);
   };
 
-  const handleBackToDashboard = () => {
+  const handleBackToDashboard = async () => {
+    // Save current canvas state before returning to dashboard
+    if (selectedTrip) {
+      try {
+        await saveTripCanvas(selectedTrip.id);
+      } catch (error) {
+        console.error('Error saving canvas before returning to dashboard:', error);
+      }
+    }
     setSelectedTrip(null);
+    setCurrentTrip(null);
   };
 
   const handleCreateTrip = async (name: string, description?: string) => {
@@ -74,13 +63,27 @@ const Dashboard: React.FC = () => {
   };
 
   const handleTripEdit = (trip: Trip) => {
-    // TODO: Implement trip editing modal
-    console.log('Edit trip:', trip);
+    setEditingTrip(trip);
+    setShowEditModal(true);
   };
 
   const handleTripDelete = (trip: Trip) => {
-    // TODO: Implement trip deletion confirmation
-    console.log('Delete trip:', trip);
+    setDeletingTrip(trip);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteTrip = async (tripId: string) => {
+    await deleteTrip(tripId);
+    setShowDeleteModal(false);
+    setDeletingTrip(null);
+  };
+
+  const handleEditTrip = async (tripId: string, name: string, description?: string) => {
+    const updatedTrip = await updateTrip(tripId, { name, description });
+    if (updatedTrip) {
+      setShowEditModal(false);
+      setEditingTrip(null);
+    }
   };
 
   // If a trip is selected, show the canvas
@@ -195,7 +198,7 @@ const Dashboard: React.FC = () => {
       <main className="p-6">
         <div className="max-w-7xl mx-auto">
           <TripsList
-            trips={displayTrips}
+            trips={trips}
             loading={loading}
             onTripClick={handleTripClick}
             onTripEdit={handleTripEdit}
@@ -211,6 +214,28 @@ const Dashboard: React.FC = () => {
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreateTrip}
         loading={createLoading}
+      />
+
+      {/* Edit Trip Modal */}
+      <EditTripModal
+        trip={editingTrip}
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingTrip(null);
+        }}
+        onSubmit={handleEditTrip}
+      />
+
+      {/* Delete Trip Confirmation */}
+      <DeleteTripConfirmation
+        trip={deletingTrip}
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeletingTrip(null);
+        }}
+        onConfirm={handleDeleteTrip}
       />
     </div>
   );

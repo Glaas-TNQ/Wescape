@@ -19,22 +19,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // For testing purposes - simulate logged user
-    const mockUser = {
-      id: 'test-user-123',
-      email: 'test.wescape@gmail.com',
-      created_at: new Date().toISOString(),
-      app_metadata: {},
-      user_metadata: {},
-      aud: 'authenticated',
-    } as any;
-
-    // Comment this out to use real authentication
-    setUser(mockUser);
-    setLoading(false);
-    return;
-
-    // Real authentication code (commented for testing)
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
