@@ -19,7 +19,9 @@
       "Bash(npm install)",
       "Bash(npm install:*)",
       "Bash(npm uninstall:*)",
-      "WebFetch(domain:reactflow.dev)"
+      "WebFetch(domain:reactflow.dev)",
+      "mcp__playwright__browser_console_messages",
+      "Bash(grep:*)"
     ],
     "deny": []
   },

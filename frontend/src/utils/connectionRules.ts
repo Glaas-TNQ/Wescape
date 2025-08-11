@@ -1,4 +1,4 @@
-import { type Node, type Connection } from '@xyflow/react';
+import { type Node, type Connection } from '@/lib/reactflow-compat';
 import { type NodeType } from '../components/canvas/nodes';
 
 export interface ConnectionRule {

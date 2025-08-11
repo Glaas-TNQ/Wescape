@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Handle, Position, NodeProps } from '@xyflow/react';
+import { Handle, Position, type NodeProps } from '@/lib/reactflow-compat';
 import { useTheme } from '../../../contexts/ThemeContext';
 import NodeActions from './NodeActions';
 

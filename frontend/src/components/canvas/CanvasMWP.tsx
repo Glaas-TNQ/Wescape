@@ -9,7 +9,7 @@ import ReactFlow, {
   type Node,
   type EdgeChange,
   type NodeChange,
-} from '@xyflow/react';
+} from '@/lib/reactflow-compat';
 import 'reactflow/dist/style.css';
 
 const initialNodes: Node[] = [

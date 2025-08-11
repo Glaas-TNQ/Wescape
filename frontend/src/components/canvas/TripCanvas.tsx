@@ -1,6 +1,5 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import ReactFlow, { Background, Controls, MiniMap, Panel, ReactFlowProvider, SelectionMode } from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
+import ReactFlow, { Background, Controls, MiniMap, Panel, ReactFlowProvider, SelectionMode } from '@/lib/reactflow-compat';
 
 import { nodeTypes } from './nodes';
 import { useCanvasStore } from '../../stores/canvasStore';

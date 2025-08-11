@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { addEdge, applyNodeChanges, applyEdgeChanges, type Node, type Edge, type Connection, type NodeChange, type EdgeChange, type XYPosition } from '@xyflow/react';
+import { addEdge, applyNodeChanges, applyEdgeChanges, type Node, type Edge, type Connection, type NodeChange, type EdgeChange, type XYPosition } from '@/lib/reactflow-compat';
 import { type NodeType } from '../components/canvas/nodes';
 import { supabase } from '../lib/supabase';
 

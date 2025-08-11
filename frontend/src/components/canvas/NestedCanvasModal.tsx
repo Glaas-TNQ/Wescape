@@ -14,7 +14,7 @@ import ReactFlow, {
   type NodeChange,
   type EdgeChange,
   type Connection,
-} from '@xyflow/react';
+} from '@/lib/reactflow-compat';
 import 'reactflow/dist/style.css';
 
 import { nodeTypes, type NodeType } from './nodes';

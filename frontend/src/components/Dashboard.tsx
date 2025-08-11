@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTrips } from '../hooks/useTrips';
 import type { Trip } from '../hooks/useTrips';
-// import { useCanvasStore } from '../stores/canvasStore';
+import { useCanvasStore } from '../stores/canvasStore';
 import ThemeToggle from './ui/ThemeToggle';
 import TripsList from './dashboard/TripsList';
 import CreateTripModal from './dashboard/CreateTripModal';

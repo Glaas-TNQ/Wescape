@@ -1,4 +1,4 @@
-import { type Node, type Edge } from '@xyflow/react';
+import { type Node, type Edge } from '@/lib/reactflow-compat';
 
 export const sampleNodes: Node[] = [
   {
