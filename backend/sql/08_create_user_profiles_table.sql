@@ -50,35 +50,38 @@ CREATE TRIGGER update_user_profiles_updated_at
     FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 -- Create a function to automatically create a profile when a user signs up
-CREATE OR REPLACE FUNCTION public.handle_new_user()       
-RETURNS TRIGGER 
-LANGUAGE plpgsql 
-SECURITY DEFINER 
-SET search_path = public 
-AS $$                                     
-BEGIN                                                     
-    -- Inserimento diretto bypassando RLS usando SECURITY DEFINER
-    INSERT INTO public.user_profiles (                    
-        id,                                               
-        full_name,                                        
-        onboarding_completed,                             
-        subscription_tier                                 
-    )                                                    
-    VALUES (                                              
-        NEW.id,                                           
-        NEW.raw_user_meta_data->>'full_name',             
-        false,                                            
-        'free'                                            
-    );                                                    
-    RETURN NEW;                                           
-END;                                                      
-$$;
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+  SECURITY DEFINER
+  SET search_path = public
+  AS $$
+  BEGIN
+      -- Create a default user profile when a new auth.users record is created
+      INSERT INTO public.user_profiles (
+          id,
+          full_name,
+          username,
+          onboarding_completed,
+          subscription_tier
+      )
+      VALUES (
+          NEW.id,
+          NULLIF(NEW.raw_user_meta_data->>'full_name', ''),
+          NULLIF(NEW.raw_user_meta_data->>'username', ''),
+          false,
+          'free'
+      )
+      ON CONFLICT (id) DO NOTHING;  -- Prevent duplicate insertions
+      
+      RETURN NEW;
+  END;
+  $$;
 
--- Create a trigger to automatically create user profile on signup
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+-- Create the trigger
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- Create storage bucket for user avatars if it doesn't exist
 INSERT INTO storage.buckets (id, name, public)

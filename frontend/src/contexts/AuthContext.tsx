@@ -48,35 +48,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, fullName: string, username?: string) => {
     try {
-      // Prima registra l'utente con Supabase Auth
+      // Registra l'utente con Supabase Auth passando i dati tramite metadata
       const { data, error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            full_name: fullName,
+            username: username || null
+          }
+        }
       });
 
       if (authError) {
         return { error: authError };
       }
 
-      // Se la registrazione è riuscita e abbiamo un utente, creiamo il profilo
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: data.user.id,
-            full_name: fullName,
-            username: username || null,
-            onboarding_completed: false,
-            subscription_tier: 'free'
-          });
-
-        if (profileError) {
-          console.error('Error creating user profile:', profileError);
-          // Non restituiamo questo errore perché l'account è già stato creato
-          // Potremmo loggar l'errore o gestirlo diversamente
-        }
-      }
-
+      // Il trigger automatico gestisce ora la creazione del profilo con i metadata
       return { error: null };
     } catch (error) {
       console.error('Unexpected error during signup:', error);
