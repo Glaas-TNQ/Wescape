@@ -4,7 +4,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 interface CreateTripModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (name: string, description?: string) => Promise<void>;
+  onSubmit: (title: string, description?: string) => Promise<void>;
   loading?: boolean;
 }
 

@@ -6,8 +6,17 @@ import { useToastContext } from '../contexts/ToastContext';
 export type Trip = {
   id: string;
   user_id: string;
-  name: string;
+  title: string;
   description: string | null;
+  destination: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  budget: number | null;
+  currency: string | null;
+  visibility: string | null;
+  cover_image: string | null;
+  settings: any | null;
+  metadata: any | null;
   created_at: string;
   updated_at: string;
 }
@@ -52,7 +61,7 @@ export const useTrips = () => {
     }
   };
 
-  const createTrip = async (name: string, description?: string) => {
+  const createTrip = async (title: string, description?: string) => {
     if (!user) {
       showToast('Devi essere loggato per creare un trip', 'error');
       return null;
@@ -63,7 +72,7 @@ export const useTrips = () => {
         .from('trips')
         .insert([
           {
-            name,
+            title,
             description: description || null,
             user_id: user.id,
           },
@@ -87,7 +96,7 @@ export const useTrips = () => {
     }
   };
 
-  const updateTrip = async (id: string, updates: Partial<Pick<Trip, 'name' | 'description'>>) => {
+  const updateTrip = async (id: string, updates: Partial<Pick<Trip, 'title' | 'description'>>) => {
     try {
       const { data, error } = await supabase
         .from('trips')

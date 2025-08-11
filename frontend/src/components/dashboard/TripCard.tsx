@@ -89,7 +89,7 @@ const TripCard: React.FC<TripCardProps> = ({ trip, onClick, onEdit, onDelete }) 
             text-xl font-bold line-clamp-2
             ${isDark ? 'text-white' : 'text-gray-900'}
           `}>
-            {trip.name}
+            {trip.title}
           </h3>
         </div>
 

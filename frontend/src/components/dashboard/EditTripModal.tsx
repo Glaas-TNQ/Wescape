@@ -7,7 +7,7 @@ interface EditTripModalProps {
   trip: Trip | null;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (tripId: string, name: string, description?: string) => Promise<void>;
+  onSubmit: (tripId: string, title: string, description?: string) => Promise<void>;
   loading?: boolean;
 }
 
@@ -28,7 +28,7 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
   // Reset form when trip changes or modal opens
   useEffect(() => {
     if (isOpen && trip) {
-      setName(trip.name || '');
+      setName(trip.title || '');
       setDescription(trip.description || '');
     }
   }, [isOpen, trip]);

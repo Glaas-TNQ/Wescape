@@ -32,6 +32,8 @@ npm run preview      # Preview production build
 ```
 
 #### Testing Commands
+When testing, if faced with a login, try using 'luca.tomasinoj@gmail.com' as email and 'Warehouse2022!' as password to log in
+
 ```bash
 # Frontend tests (when implemented)
 cd frontend

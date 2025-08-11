@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { addEdge, applyNodeChanges, applyEdgeChanges, type Node, type Edge, type Connection, type NodeChange, type EdgeChange, type XYPosition } from '@/lib/reactflow-compat';
 import { type NodeType } from '../components/canvas/nodes';
 import { supabase } from '../lib/supabase';
+import { sampleNodes, sampleEdges } from '../components/canvas/SampleData';
 
 export interface CanvasState {
   nodes: Node[];
@@ -109,6 +110,7 @@ const getDefaultNodeData = (type: NodeType) => {
     image: {
       imageUrl: '',
       caption: 'Nuova Immagine',
+      title: '', // Editable title for didascalia
       width: 280,
       height: 200,
       customColor: null,
@@ -411,75 +413,6 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
   },
 
   loadSampleData: () => {
-    const sampleNodes = [
-      {
-        id: 'destination_1',
-        type: 'destination',
-        position: { x: 200, y: 100 },
-        data: {
-          title: 'Roma',
-          description: 'La città eterna ti aspetta con la sua storia millenaria',
-          date: '15-18 Maggio 2024',
-          location: 'Roma, Italia'
-        }
-      },
-      {
-        id: 'activity_1',
-        type: 'activity',
-        position: { x: 500, y: 100 },
-        data: {
-          title: 'Colosseo',
-          description: 'Tour guidato con accesso prioritario ai sotterranei',
-          time: 'Giorno 1 • 09:00-12:00',
-          duration: '3 ore',
-          category: 'Monumenti'
-        }
-      },
-      {
-        id: 'restaurant_1',
-        type: 'restaurant',
-        position: { x: 350, y: 300 },
-        data: {
-          title: 'Trattoria Monti',
-          description: 'Cucina romana autentica nel cuore di Roma',
-          time: 'Giorno 1 • 13:00',
-          cuisine: 'Romana',
-          priceRange: '€€',
-          rating: 4.5
-        }
-      },
-      {
-        id: 'hotel_1',
-        type: 'hotel',
-        position: { x: 650, y: 300 },
-        data: {
-          title: 'Hotel Artemide',
-          description: '4★ elegante hotel vicino alla Stazione Termini',
-          checkIn: '15 Maggio, 15:00',
-          checkOut: '18 Maggio, 11:00',
-          stars: 4
-        }
-      }
-    ];
-
-    const sampleEdges = [
-      {
-        id: 'destination_1-activity_1',
-        source: 'destination_1',
-        target: 'activity_1',
-        type: 'smoothstep',
-        animated: true,
-        style: { stroke: '#8b5cf6', strokeWidth: 2 }
-      },
-      {
-        id: 'activity_1-restaurant_1',
-        source: 'activity_1',
-        target: 'restaurant_1',
-        type: 'smoothstep',
-        animated: true,
-        style: { stroke: '#06b6d4', strokeWidth: 2 }
-      }
-    ];
 
     set(state => {
       const newState = { nodes: sampleNodes, edges: sampleEdges };

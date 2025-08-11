@@ -82,6 +82,18 @@ export const sampleNodes: Node[] = [
       date: '15 Maggio 2024 • Mercoledì',
       title: 'Primo Giorno - Centro Storico'
     }
+  },
+  {
+    id: 'image_1',
+    type: 'image',
+    position: { x: 900, y: 300 },
+    data: {
+      imageUrl: 'https://images.unsplash.com/photo-1552832230-c0197040cd5f?w=300&h=200&fit=crop',
+      caption: 'Colosseo - Roma',
+      title: 'Anfiteatro Flavio',
+      width: 280,
+      height: 200
+    }
   }
 ];
 
@@ -115,5 +127,13 @@ export const sampleEdges: Edge[] = [
     target: 'activity_1',
     type: 'smoothstep',
     style: { stroke: '#ef4444', strokeWidth: 2 }
+  },
+  {
+    id: 'activity_1-image_1',
+    source: 'activity_1',
+    target: 'image_1',
+    type: 'smoothstep',
+    animated: true,
+    style: { stroke: '#10b981', strokeWidth: 2 }
   }
 ];

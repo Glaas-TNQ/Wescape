@@ -62,10 +62,10 @@ const Dashboard: React.FC = () => {
     setShowSettings(false);
   };
 
-  const handleCreateTrip = async (name: string, description?: string) => {
+  const handleCreateTrip = async (title: string, description?: string) => {
     setCreateLoading(true);
     try {
-      const newTrip = await createTrip(name, description);
+      const newTrip = await createTrip(title, description);
       if (newTrip) {
         setShowCreateModal(false);
         // Optionally open the newly created trip
@@ -92,8 +92,8 @@ const Dashboard: React.FC = () => {
     setDeletingTrip(null);
   };
 
-  const handleEditTrip = async (tripId: string, name: string, description?: string) => {
-    const updatedTrip = await updateTrip(tripId, { name, description });
+  const handleEditTrip = async (tripId: string, title: string, description?: string) => {
+    const updatedTrip = await updateTrip(tripId, { title, description });
     if (updatedTrip) {
       setShowEditModal(false);
       setEditingTrip(null);
@@ -135,7 +135,7 @@ const Dashboard: React.FC = () => {
               text-2xl font-bold
               ${isDark ? 'text-white' : 'text-gray-900'}
             `}>
-              {selectedTrip.name}
+              {selectedTrip.title}
             </h1>
           </div>
           

@@ -21,7 +21,8 @@
       "Bash(npm uninstall:*)",
       "WebFetch(domain:reactflow.dev)",
       "mcp__playwright__browser_console_messages",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "mcp__playwright__browser_hover"
     ],
     "deny": []
   },

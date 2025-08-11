@@ -99,7 +99,7 @@ const DeleteTripConfirmation: React.FC<DeleteTripConfirmationProps> = ({
               font-semibold mb-2
               ${isDark ? 'text-white' : 'text-gray-900'}
             `}>
-              {trip.name || 'Trip senza nome'}
+              {trip.title || 'Trip senza nome'}
             </h3>
             {trip.description && (
               <p className={`
