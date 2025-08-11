@@ -68,6 +68,7 @@ const Toolbar: React.FC = () => {
       note: 'Nota',
       dayDivider: 'Divisore Giorno',
       nestedCanvas: 'Canvas Annidato',
+      image: 'Immagine',
     };
     return names[type] || 'Nodo';
   };
@@ -126,6 +127,13 @@ const Toolbar: React.FC = () => {
           icon="🔗"
           label="Canvas Annidato"
           onClick={() => addNodeToCanvas('nestedCanvas')}
+        />
+        
+        <ToolButton
+          type="image"
+          icon="🖼️"
+          label="Aggiungi Immagine"
+          onClick={() => addNodeToCanvas('image')}
         />
         
         <div className="col-span-2 flex justify-center">

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Handle, Position, NodeResizer, type NodeProps } from 'reactflow';
+import { Handle, Position, NodeResizer, type NodeProps } from '@xyflow/react';
 import NestedCanvasNodeActions from './NestedCanvasNodeActions';
 import { getNodeColors } from '../../../utils/nodeColors';
 

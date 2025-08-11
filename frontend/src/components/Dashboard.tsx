@@ -3,16 +3,18 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTrips } from '../hooks/useTrips';
 import type { Trip } from '../hooks/useTrips';
-import { useCanvasStore } from '../stores/canvasStore';
+// import { useCanvasStore } from '../stores/canvasStore';
 import ThemeToggle from './ui/ThemeToggle';
 import TripsList from './dashboard/TripsList';
 import CreateTripModal from './dashboard/CreateTripModal';
 import EditTripModal from './dashboard/EditTripModal';
 import DeleteTripConfirmation from './dashboard/DeleteTripConfirmation';
 import TripCanvas from './canvas/TripCanvas';
+import UserSettings from './settings/UserSettings';
 
 const Dashboard: React.FC = () => {
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
@@ -40,12 +42,24 @@ const Dashboard: React.FC = () => {
     if (selectedTrip) {
       try {
         await saveTripCanvas(selectedTrip.id);
+        console.log('Canvas saved successfully');
       } catch (error) {
         console.error('Error saving canvas before returning to dashboard:', error);
       }
     }
     setSelectedTrip(null);
     setCurrentTrip(null);
+    setShowSettings(false);
+  };
+
+  const handleShowSettings = () => {
+    setShowSettings(true);
+    setSelectedTrip(null);
+    setCurrentTrip(null);
+  };
+
+  const handleBackFromSettings = () => {
+    setShowSettings(false);
   };
 
   const handleCreateTrip = async (name: string, description?: string) => {
@@ -85,6 +99,11 @@ const Dashboard: React.FC = () => {
       setEditingTrip(null);
     }
   };
+
+  // If settings is selected, show the settings page
+  if (showSettings) {
+    return <UserSettings onBack={handleBackFromSettings} />;
+  }
 
   // If a trip is selected, show the canvas
   if (selectedTrip) {
@@ -178,6 +197,19 @@ const Dashboard: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-3">
+          <button
+            onClick={handleShowSettings}
+            className={`
+              p-2 rounded-lg transition-all hover:scale-110
+              ${isDark 
+                ? 'text-white/60 hover:text-white hover:bg-white/10' 
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+              }
+            `}
+            title="Impostazioni"
+          >
+            ⚙️
+          </button>
           <ThemeToggle />
           <button
             onClick={handleSignOut}

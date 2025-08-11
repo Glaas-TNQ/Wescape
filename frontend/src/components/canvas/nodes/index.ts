@@ -6,6 +6,7 @@ import TransportNode from './TransportNode';
 import NoteNode from './NoteNode';
 import DayDividerNode from './DayDividerNode';
 import NestedCanvasNode from './NestedCanvasNode';
+import ImageNode from './ImageNode';
 
 export const nodeTypes = {
   destination: DestinationNode,
@@ -15,7 +16,8 @@ export const nodeTypes = {
   transport: TransportNode,
   note: NoteNode,
   dayDivider: DayDividerNode,
-  nestedCanvas: NestedCanvasNode
+  nestedCanvas: NestedCanvasNode,
+  image: ImageNode
 };
 
 export {
@@ -26,7 +28,8 @@ export {
   TransportNode,
   NoteNode,
   DayDividerNode,
-  NestedCanvasNode
+  NestedCanvasNode,
+  ImageNode
 };
 
 export type NodeType = keyof typeof nodeTypes;

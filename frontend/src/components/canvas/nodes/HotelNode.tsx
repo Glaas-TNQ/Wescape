@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Handle, Position, NodeResizer, type NodeProps } from 'reactflow';
+import { Handle, Position, NodeResizer, type NodeProps } from '@xyflow/react';
 import NodeActions from './NodeActions';
 import { getNodeColors } from '../../../utils/nodeColors';
 

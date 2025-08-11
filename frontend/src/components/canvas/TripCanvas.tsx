@@ -1,13 +1,6 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import ReactFlow, {
-  Background,
-  Controls,
-  MiniMap,
-  Panel,
-  ReactFlowProvider,
-  SelectionMode,
-} from 'reactflow';
-import 'reactflow/dist/style.css';
+import ReactFlow, { Background, Controls, MiniMap, Panel, ReactFlowProvider, SelectionMode } from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 
 import { nodeTypes } from './nodes';
 import { useCanvasStore } from '../../stores/canvasStore';
@@ -25,6 +18,8 @@ import EmptyState from './EmptyState';
 import ToastContainer from '../ui/ToastContainer';
 import ThemeToggle from '../ui/ThemeToggle';
 import { useToast } from '../../hooks/useToast';
+import { useAuth } from '../../contexts/AuthContext';
+import { handlePasteImage, uploadImage, getOptimalImageDimensions } from '../../utils/imageUpload';
 
 const TripCanvas = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -37,7 +32,9 @@ const TripCanvas = () => {
     currentColor: string | null;
     position: { x: number; y: number };
   } | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const { toasts, removeToast, toast } = useToast();
+  const { user } = useAuth();
   const { isDark } = useTheme();
   const themeColors = getThemeColors(isDark);
   const canvasBackground = getCanvasBackground(isDark);
@@ -82,6 +79,92 @@ const TripCanvas = () => {
 
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
+
+  // Handle paste for image screenshots
+  const handlePaste = useCallback(async (event: ClipboardEvent) => {
+    if (!user) {
+      toast.error('Devi essere loggato per caricare immagini');
+      return;
+    }
+
+    if (isUploadingImage) {
+      toast.warning('Upload già in corso...');
+      return;
+    }
+
+    // Check if target is an input or textarea to avoid interfering with text paste
+    const target = event.target as HTMLElement;
+    if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.contentEditable === 'true') {
+      return;
+    }
+
+    const imageFile = await handlePasteImage(event);
+    if (!imageFile) {
+      return; // No image in clipboard
+    }
+
+    // Prevent default paste behavior
+    event.preventDefault();
+
+    setIsUploadingImage(true);
+    toast.info('Caricamento screenshot in corso...');
+
+    try {
+      // Upload image to Supabase Storage
+      const uploadResult = await uploadImage(imageFile, user.id, 'screenshot');
+      
+      if (!uploadResult.success || !uploadResult.url) {
+        toast.error(uploadResult.error || 'Errore nel caricamento dell\'immagine');
+        return;
+      }
+
+      // Get image dimensions for creating optimal node size
+      const img = new Image();
+      img.onload = () => {
+        const { width, height } = getOptimalImageDimensions(img.width, img.height);
+        
+        // Get center position or use last mouse position
+        const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
+        const position = reactFlowBounds ? {
+          x: reactFlowBounds.width / 2 - width / 2,
+          y: reactFlowBounds.height / 2 - height / 2,
+        } : { x: 200, y: 200 };
+
+        // Add image node to canvas
+        useCanvasStore.getState().addNode('image', position, {
+          imageUrl: uploadResult.url,
+          caption: `Screenshot ${new Date().toLocaleTimeString('it-IT')}`,
+          width,
+          height,
+        });
+
+        toast.success('Screenshot aggiunto al canvas!');
+      };
+      
+      img.onerror = () => {
+        toast.error('Errore nel caricamento dell\'immagine');
+      };
+      
+      img.src = uploadResult.url;
+    } catch (error) {
+      console.error('Error handling paste image:', error);
+      toast.error('Errore nel caricamento dello screenshot');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  }, [user, isUploadingImage, toast]);
+
+  // Add paste event listener
+  useEffect(() => {
+    const handlePasteEvent = (event: ClipboardEvent) => {
+      handlePaste(event);
+    };
+
+    document.addEventListener('paste', handlePasteEvent);
+    return () => {
+      document.removeEventListener('paste', handlePasteEvent);
+    };
+  }, [handlePaste]);
 
   // Handle node edit/delete events from nodes
   useEffect(() => {
@@ -191,6 +274,36 @@ const TripCanvas = () => {
           >
             {nodes.length} elementi
           </div>
+          
+          {/* Paste hint */}
+          {!isUploadingImage && (
+            <div 
+              className="text-xs px-2 py-1 rounded-full border"
+              style={{
+                color: themeColors.text.secondary,
+                borderColor: themeColors.border.secondary,
+                backgroundColor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(243, 244, 246, 0.5)'
+              }}
+              title="Incolla screenshot con Ctrl+V"
+            >
+              📋 Ctrl+V per screenshot
+            </div>
+          )}
+          
+          {/* Upload status */}
+          {isUploadingImage && (
+            <div 
+              className="text-xs px-2 py-1 rounded-full border flex items-center gap-1"
+              style={{
+                color: themeColors.text.secondary,
+                borderColor: themeColors.border.secondary,
+                backgroundColor: isDark ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.1)'
+              }}
+            >
+              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+              Upload...
+            </div>
+          )}
         </div>
         
         <ViewSwitcher />
@@ -247,7 +360,6 @@ const TripCanvas = () => {
           nodesDraggable={true}
           elementsSelectable={true}
           nodeExtent={undefined}
-          nodesConnectable={true}
         >
           {/* Background with dots pattern */}
           <Background 

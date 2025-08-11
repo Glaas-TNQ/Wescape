@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { addEdge, applyNodeChanges, applyEdgeChanges, type Node, type Edge, type Connection, type NodeChange, type EdgeChange, type XYPosition } from 'reactflow';
+import { addEdge, applyNodeChanges, applyEdgeChanges, type Node, type Edge, type Connection, type NodeChange, type EdgeChange, type XYPosition } from '@xyflow/react';
 import { type NodeType } from '../components/canvas/nodes';
 import { supabase } from '../lib/supabase';
 
@@ -106,6 +106,13 @@ const getDefaultNodeData = (type: NodeType) => {
       isExpanded: false,
       customColor: null,
     },
+    image: {
+      imageUrl: '',
+      caption: 'Nuova Immagine',
+      width: 280,
+      height: 200,
+      customColor: null,
+    },
   };
   
   return defaults[type] || {};
@@ -130,7 +137,8 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
         'transport': { width: 220, height: 160 },
         'note': { width: 200, height: 120 },
         'dayDivider': { width: 320, height: 140 },
-        'nestedCanvas': { width: 280, height: 180 }
+        'nestedCanvas': { width: 280, height: 180 },
+        'image': { width: 280, height: 240 }
       };
       
       const { width, height } = dimensions[nodeType] || { width: 220, height: 140 };
