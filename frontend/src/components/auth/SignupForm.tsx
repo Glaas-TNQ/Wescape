@@ -11,6 +11,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const { signUp } = useAuth();
@@ -18,8 +20,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   const { showToast } = useToastContext();
 
   const validateForm = () => {
-    if (!email || !password || !confirmPassword) {
-      showToast('Compila tutti i campi', 'error');
+    if (!email || !password || !confirmPassword || !fullName) {
+      showToast('Compila tutti i campi obbligatori', 'error');
       return false;
     }
 
@@ -51,7 +53,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
     setIsLoading(true);
     
     try {
-      const { error } = await signUp(email, password);
+      const { error } = await signUp(email, password, fullName, username);
       
       if (error) {
         showToast(error.message, 'error');
@@ -61,6 +63,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
         setEmail('');
         setPassword('');
         setConfirmPassword('');
+        setFullName('');
+        setUsername('');
       }
     } catch {
       showToast('Errore durante la registrazione', 'error');
@@ -86,6 +90,54 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className={`
+              block text-sm font-medium mb-2
+              ${isDark ? 'text-white/90' : 'text-gray-700'}
+            `}>
+              Nome Completo *
+            </label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className={`
+                w-full px-4 py-3 rounded-lg border transition-all
+                focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                ${isDark 
+                  ? 'bg-white/10 border-white/20 text-white placeholder-white/50' 
+                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                }
+              `}
+              placeholder="es. Mario Rossi"
+              disabled={isLoading}
+            />
+          </div>
+
+          <div>
+            <label className={`
+              block text-sm font-medium mb-2
+              ${isDark ? 'text-white/90' : 'text-gray-700'}
+            `}>
+              Username (opzionale)
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className={`
+                w-full px-4 py-3 rounded-lg border transition-all
+                focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                ${isDark 
+                  ? 'bg-white/10 border-white/20 text-white placeholder-white/50' 
+                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                }
+              `}
+              placeholder="es. mariorossi"
+              disabled={isLoading}
+            />
+          </div>
+
           <div>
             <label className={`
               block text-sm font-medium mb-2

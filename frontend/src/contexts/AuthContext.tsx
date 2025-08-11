@@ -7,7 +7,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
-  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signUp: (email: string, password: string, fullName: string, username?: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
 }
 
@@ -46,12 +46,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
-  const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    return { error };
+  const signUp = async (email: string, password: string, fullName: string, username?: string) => {
+    try {
+      // Prima registra l'utente con Supabase Auth
+      const { data, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (authError) {
+        return { error: authError };
+      }
+
+      // Se la registrazione è riuscita e abbiamo un utente, creiamo il profilo
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: data.user.id,
+            full_name: fullName,
+            username: username || null,
+            onboarding_completed: false,
+            subscription_tier: 'free'
+          });
+
+        if (profileError) {
+          console.error('Error creating user profile:', profileError);
+          // Non restituiamo questo errore perché l'account è già stato creato
+          // Potremmo loggar l'errore o gestirlo diversamente
+        }
+      }
+
+      return { error: null };
+    } catch (error) {
+      console.error('Unexpected error during signup:', error);
+      return { error: error as AuthError };
+    }
   };
 
   const signOut = async () => {

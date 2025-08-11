@@ -47,7 +47,7 @@ pytest tests/ -v --cov=app # Run tests with coverage
 ```
 
 ## Development Workflow Requirements
-
+remember that you can always see the schema of the database by looking at /backend/sql folder, inside you'll find all the sql files used to create the database
 ### DevJournal.md Management
 **MANDATORY**: Before starting any development task, follow this workflow:
 

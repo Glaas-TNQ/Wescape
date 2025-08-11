@@ -1,13 +1,23 @@
 -- Create user_profiles table for user settings and profile information
 CREATE TABLE IF NOT EXISTS public.user_profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-    display_name TEXT,
+    username TEXT UNIQUE,
+    full_name TEXT,
     avatar_url TEXT,
     bio TEXT,
+    travel_style TEXT[],
     preferences JSONB DEFAULT '{}',
+    onboarding_completed BOOLEAN DEFAULT FALSE,
+    subscription_tier TEXT DEFAULT 'free' CHECK (subscription_tier IN ('free', 'premium', 'pro')),
+    subscription_expires_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_user_profiles_username ON public.user_profiles (username);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_subscription ON public.user_profiles (subscription_tier);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_updated_at ON public.user_profiles (updated_at);
 
 -- Enable Row Level Security
 ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
@@ -40,14 +50,29 @@ CREATE TRIGGER update_user_profiles_updated_at
     FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 -- Create a function to automatically create a profile when a user signs up
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO public.user_profiles (id, display_name)
-    VALUES (NEW.id, NEW.raw_user_meta_data->>'full_name');
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+CREATE OR REPLACE FUNCTION public.handle_new_user()       
+RETURNS TRIGGER 
+LANGUAGE plpgsql 
+SECURITY DEFINER 
+SET search_path = public 
+AS $$                                     
+BEGIN                                                     
+    -- Inserimento diretto bypassando RLS usando SECURITY DEFINER
+    INSERT INTO public.user_profiles (                    
+        id,                                               
+        full_name,                                        
+        onboarding_completed,                             
+        subscription_tier                                 
+    )                                                    
+    VALUES (                                              
+        NEW.id,                                           
+        NEW.raw_user_meta_data->>'full_name',             
+        false,                                            
+        'free'                                            
+    );                                                    
+    RETURN NEW;                                           
+END;                                                      
+$$;
 
 -- Create a trigger to automatically create user profile on signup
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;

@@ -10,7 +10,7 @@
         "--project-ref=https://meztxbectoiageapafix.supabase.co"
       ],
       "env": {
-        "SUPABASE_ACCESS_TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lenR4YmVjdG9pYWdlYXBhZml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MDI0MTQsImV4cCI6MjA2OTk3ODQxNH0.io43P9H1FleRpfj6VTLCwSgsp-vFTCB25Mrd_YH1Bhs"
+        "SUPABASE_ACCESS_TOKEN": "sbp_d314aaed88156b55dd1b2de9aa0937e09a5289cf"
       }
     },
     "sequentialthinking": {
