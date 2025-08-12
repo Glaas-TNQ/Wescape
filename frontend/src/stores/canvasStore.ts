@@ -115,6 +115,24 @@ const getDefaultNodeData = (type: NodeType) => {
       height: 200,
       customColor: null,
     },
+    pinterestPin: {
+      pinUrl: '',
+      title: 'Pinterest Pin',
+      description: 'Clicca per configurare il pin',
+      embedMethod: 'react-component' as const,
+      customColor: null,
+      isPinned: false,
+    },
+    pinterestBoard: {
+      boardUrl: '',
+      boardName: 'Pinterest Board',
+      description: 'Clicca per configurare la board',
+      displayMode: 'grid' as const,
+      maxPreviews: 6,
+      pinCount: 0,
+      previewPins: [],
+      customColor: null,
+    },
   };
   
   return defaults[type] || {};

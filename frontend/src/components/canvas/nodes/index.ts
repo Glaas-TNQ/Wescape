@@ -7,6 +7,8 @@ import NoteNode from './NoteNode';
 import DayDividerNode from './DayDividerNode';
 import NestedCanvasNode from './NestedCanvasNode';
 import ImageNode from './ImageNode';
+import PinterestPinNode from './PinterestPinNode';
+import PinterestBoardNode from './PinterestBoardNode';
 
 export const nodeTypes = {
   destination: DestinationNode,
@@ -17,7 +19,9 @@ export const nodeTypes = {
   note: NoteNode,
   dayDivider: DayDividerNode,
   nestedCanvas: NestedCanvasNode,
-  image: ImageNode
+  image: ImageNode,
+  pinterestPin: PinterestPinNode,
+  pinterestBoard: PinterestBoardNode,
 };
 
 export {
@@ -29,7 +33,9 @@ export {
   NoteNode,
   DayDividerNode,
   NestedCanvasNode,
-  ImageNode
+  ImageNode,
+  PinterestPinNode,
+  PinterestBoardNode,
 };
 
 export type NodeType = keyof typeof nodeTypes;

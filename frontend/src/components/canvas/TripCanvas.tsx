@@ -16,6 +16,8 @@ import ColorPickerOverlay from './ColorPickerOverlay';
 import EmptyState from './EmptyState';
 import ToastContainer from '../ui/ToastContainer';
 import ThemeToggle from '../ui/ThemeToggle';
+import PinterestImportModal from './modals/PinterestImportModal';
+import PinterestBoardModal from './modals/PinterestBoardModal';
 import { useToast } from '../../hooks/useToast';
 import { useAuth } from '../../contexts/AuthContext';
 import { handlePasteImage, uploadImage, getOptimalImageDimensions } from '../../utils/imageUpload';
@@ -39,6 +41,13 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
     position: { x: number; y: number };
   } | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isPinterestModalOpen, setIsPinterestModalOpen] = useState(false);
+  const [pinterestModalPosition, setPinterestModalPosition] = useState({ x: 100, y: 100 });
+  const [pinterestBoardModal, setPinterestBoardModal] = useState<{
+    isOpen: boolean;
+    nodeId: string | null;
+    boardData: any;
+  }>({ isOpen: false, nodeId: null, boardData: null });
   const { toasts, removeToast, toast } = useToast();
   const { user: authUser } = useAuth();
   const user = propUser || authUser;
@@ -208,11 +217,26 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
       else toast.info(message);
     };
 
+    const handleOpenPinterestModalEvent = () => {
+      setIsPinterestModalOpen(true);
+    };
+
+    const handleOpenPinterestBoard = (event: CustomEvent) => {
+      const { nodeId, boardData } = event.detail;
+      setPinterestBoardModal({
+        isOpen: true,
+        nodeId,
+        boardData
+      });
+    };
+
     window.addEventListener('editNode', handleEditNode as EventListener);
     window.addEventListener('deleteNode', handleDeleteNode as EventListener);
     window.addEventListener('openNestedCanvas', handleOpenNestedCanvas as EventListener);
     window.addEventListener('openColorPicker', handleOpenColorPicker as EventListener);
     window.addEventListener('showToast', handleShowToast as EventListener);
+    window.addEventListener('openPinterestModal', handleOpenPinterestModalEvent as EventListener);
+    window.addEventListener('openPinterestBoard', handleOpenPinterestBoard as EventListener);
 
     return () => {
       window.removeEventListener('editNode', handleEditNode as EventListener);
@@ -220,6 +244,8 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
       window.removeEventListener('openNestedCanvas', handleOpenNestedCanvas as EventListener);
       window.removeEventListener('openColorPicker', handleOpenColorPicker as EventListener);
       window.removeEventListener('showToast', handleShowToast as EventListener);
+      window.removeEventListener('openPinterestModal', handleOpenPinterestModalEvent as EventListener);
+      window.removeEventListener('openPinterestBoard', handleOpenPinterestBoard as EventListener);
     };
   }, [deleteNodes]);
 
@@ -249,6 +275,19 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
     },
     []
   );
+
+  // Handle Pinterest modal opening
+  const handleOpenPinterestModal = useCallback((event?: React.MouseEvent) => {
+    if (event && reactFlowWrapper.current) {
+      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+      const position = {
+        x: event.clientX - reactFlowBounds.left,
+        y: event.clientY - reactFlowBounds.top,
+      };
+      setPinterestModalPosition(position);
+    }
+    setIsPinterestModalOpen(true);
+  }, []);
 
   // Custom node color for minimap with support for custom colors
   const getNodeColor = (node: any) => {
@@ -482,6 +521,21 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
           }}
         />
       )}
+
+      {/* Pinterest Import Modal */}
+      <PinterestImportModal
+        isOpen={isPinterestModalOpen}
+        onClose={() => setIsPinterestModalOpen(false)}
+        position={pinterestModalPosition}
+      />
+
+      {/* Pinterest Board Modal */}
+      <PinterestBoardModal
+        isOpen={pinterestBoardModal.isOpen}
+        onClose={() => setPinterestBoardModal({ isOpen: false, nodeId: null, boardData: null })}
+        boardData={pinterestBoardModal.boardData}
+        nodeId={pinterestBoardModal.nodeId}
+      />
 
       {/* Toast Notifications */}
       <ToastContainer toasts={toasts} onClose={removeToast} />

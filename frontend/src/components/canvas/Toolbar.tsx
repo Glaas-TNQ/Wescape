@@ -69,8 +69,14 @@ const Toolbar: React.FC = () => {
       dayDivider: 'Divisore Giorno',
       nestedCanvas: 'Canvas Annidato',
       image: 'Immagine',
+      pinterestPin: 'Pinterest Pin',
+      pinterestBoard: 'Pinterest Board',
     };
     return names[type] || 'Nodo';
+  };
+
+  const openPinterestModal = () => {
+    window.dispatchEvent(new CustomEvent('openPinterestModal'));
   };
 
   const canUndo = historyIndex > 0;
@@ -135,8 +141,27 @@ const Toolbar: React.FC = () => {
           label="Aggiungi Immagine"
           onClick={() => addNodeToCanvas('image')}
         />
+      </div>
+      
+      {/* Pinterest Section */}
+      <div className="grid grid-cols-2 gap-2 mb-2 pt-2 border-t border-white/10">
+        <button
+          onClick={openPinterestModal}
+          className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-colors duration-200 flex items-center justify-center gap-1"
+        >
+          📌 Import Pinterest
+        </button>
         
-        <div className="col-span-2 flex justify-center">
+        <ToolButton
+          type="pinterestPin"
+          icon="📌"
+          label="Pinterest Pin Esempio"
+          onClick={() => addNodeToCanvas('pinterestPin')}
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 gap-2 mb-2">        
+        <div className="flex justify-center">
           <ToolButton
             type="dayDivider"
             icon="📅"
