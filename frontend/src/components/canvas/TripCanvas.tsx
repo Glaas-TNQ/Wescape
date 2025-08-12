@@ -21,6 +21,7 @@ import PinterestBoardModal from './modals/PinterestBoardModal';
 import { useToast } from '../../hooks/useToast';
 import { useAuth } from '../../contexts/AuthContext';
 import { handlePasteImage, uploadImage, getOptimalImageDimensions } from '../../utils/imageUpload';
+import { ChatSidebar, useChatStore } from '../chat';
 
 interface TripCanvasProps {
   tripTitle?: string;
@@ -51,6 +52,10 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
   const { toasts, removeToast, toast } = useToast();
   const { user: authUser } = useAuth();
   const user = propUser || authUser;
+  
+  // Chat integration
+  const { setCanvasContext } = useChatStore();
+  const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   const { isDark } = useTheme();
   const themeColors = getThemeColors(isDark);
   const canvasBackground = getCanvasBackground(isDark);
@@ -65,6 +70,8 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
     onEdgesChange,
     onConnect: storeOnConnect,
     deleteNodes,
+    currentTripId,
+    setCurrentTrip,
   } = useCanvasStore();
 
   // Custom onConnect with validation
@@ -95,6 +102,35 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
 
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
+
+  // Update chat context when canvas changes
+  useEffect(() => {
+    if (reactFlowInstance) {
+      const viewport = reactFlowInstance.getViewport();
+      setCanvasContext({
+        tripId: currentTripId,
+        viewport: {
+          x: viewport.x,
+          y: viewport.y,
+          zoom: viewport.zoom
+        },
+        existingNodes: nodes,
+        selectedNodes: nodes.filter(node => node.selected).map(node => node.id),
+        lastModified: new Date().toISOString()
+      });
+    }
+  }, [nodes, edges, currentTripId, reactFlowInstance, setCanvasContext]);
+
+  // Track viewport changes for chat context
+  const onViewportChange = useCallback((viewport: any) => {
+    setCanvasContext({
+      viewport: {
+        x: viewport.x,
+        y: viewport.y,
+        zoom: viewport.zoom
+      }
+    });
+  }, [setCanvasContext]);
 
   // Handle paste for image screenshots
   const handlePaste = useCallback(async (event: ClipboardEvent) => {
@@ -431,6 +467,9 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
           onSelectionChange={onSelectionChange}
           onNodesDelete={onNodesDelete}
           nodeTypes={nodeTypes}
+          onInit={setReactFlowInstance}
+          onMove={onViewportChange}
+          onMoveEnd={onViewportChange}
           fitView
           snapToGrid
           snapGrid={[15, 15]}
@@ -536,6 +575,9 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
         boardData={pinterestBoardModal.boardData}
         nodeId={pinterestBoardModal.nodeId}
       />
+
+      {/* Chat Sidebar */}
+      <ChatSidebar />
 
       {/* Toast Notifications */}
       <ToastContainer toasts={toasts} onClose={removeToast} />

@@ -1126,3 +1126,31 @@ PinterestBoardModal:
 **RISULTATO FINALE**: Pinterest Board Modal completamente ridisegnata con UX professionale, scrolling perfetto, e visibilità ottimale per esperienza utente eccellente! 🎉📌
 
 ---
+## [2025-08-12] Task: Analyze and document how trips and cards are saved
+**Status**: Completed
+**Agent**: Roo
+
+### Reasoning
+The user asked for an explanation of how the trips and the cards on the canvas are saved. To provide a comprehensive answer, I performed the following steps:
+1.  **Analyzed the database schema**: I inspected the SQL files in `backend/sql/` to understand the structure of the `trips` and `cards` tables.
+2.  **Investigated the backend API**: I looked for the API endpoints in `backend/app/api/v1/` and the main application file `backend/app/main.py` to understand how data is written to the database. I found that the backend is not yet implemented.
+3.  **Examined the frontend logic**: I reviewed the frontend hooks and stores, specifically `frontend/src/hooks/useTrips.ts` and `frontend/src/stores/canvasStore.ts`, to understand how the frontend interacts with Supabase to save data.
+
+This investigation revealed that the frontend application communicates directly with the Supabase database to manage all data.
+
+### Files Analyzed
+- `backend/sql/01_create_trips_table.sql`
+- `backend/sql/02_create_cards_table.sql`
+- `backend/app/main.py`
+- `frontend/src/hooks/useTrips.ts`
+- `frontend/src/stores/canvasStore.ts`
+
+### Key Findings
+- The application uses a React frontend that communicates directly with a Supabase database.
+- The backend, planned to be built with FastAPI, is not yet implemented.
+- The `trips` table in the database stores the main information for each trip, including a `canvas_data` column of type `JSONB` that holds the entire state of the trip's canvas.
+- The `cards` table stores the individual cards for each trip, with a foreign key relationship to the `trips` table.
+- The `useTrips.ts` hook manages all CRUD operations for trips.
+- The `canvasStore.ts` Zustand store manages the state of the canvas and includes functions to load and save the canvas state to the `canvas_data` field in the `trips` table.
+
+---
