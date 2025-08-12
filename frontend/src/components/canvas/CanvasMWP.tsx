@@ -100,7 +100,7 @@ export default function CanvasMWP() {
   return (
     <div className="h-full w-full flex flex-col">
       <div className="flex items-center justify-between border-b bg-white px-4 py-2">
-        <h1 className="text-lg font-semibold">WeScape Canvas MWP</h1>
+        <h1 className="text-lg font-semibold">Triptify Canvas MWP</h1>
         <div className="flex items-center gap-2">
           <button
             onClick={onAddNode}

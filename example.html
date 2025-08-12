@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WeScape — I tuoi trip</title>
+<style>
+  :root{
+    --bg:#0b0d10;
+    --panel:rgba(255,255,255,.06);
+    --panel-strong:rgba(255,255,255,.12);
+    --border:#23262d;
+    --text:#e9eef6;
+    --muted:#9ba3af;
+    --brand:#2563eb;      /* blu del CTA */
+    --brand-quiet:#1e40af;
+    --success:#22c55e;
+    --warning:#f59e0b;
+    --shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+    --radius:18px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background: radial-gradient(1200px 800px at 80% -10%, rgba(37,99,235,.15), transparent 60%) , var(--bg);
+    color:var(--text); font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  }
+  a{color:inherit; text-decoration:none}
+
+  /* Header */
+  .shell{max-width:1180px; margin:0 auto; padding:32px 20px 80px}
+  .topbar{
+    display:flex; align-items:center; gap:14px; justify-content:space-between;
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.2px}
+  .brand .logo{
+    width:28px; height:28px; display:grid; place-items:center;
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:10px; box-shadow:var(--shadow);
+  }
+  .rightbar{display:flex; align-items:center; gap:10px}
+  .pill{
+    background:var(--panel); border:1px solid var(--border); color:var(--muted);
+    padding:8px 12px; border-radius:999px; display:flex; align-items:center; gap:8px;
+  }
+  .btn{
+    border:1px solid transparent; background:var(--panel); color:var(--text);
+    padding:10px 14px; border-radius:12px; cursor:pointer; transition:.18s transform,.18s background,.18s border-color, .18s box-shadow;
+    box-shadow:var(--shadow);
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn--ghost{background:var(--panel); border-color:var(--border)}
+  .btn--danger{background:transparent; border-color:#ef4444; color:#ef4444}
+  .btn--brand{background:linear-gradient(180deg, var(--brand), var(--brand-quiet)); border-color:rgba(255,255,255,.12)}
+
+  /* Title row */
+  .title{
+    margin-top:36px; display:flex; align-items:end; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+  .title h1{margin:0; font-size:28px; letter-spacing:.2px}
+  .subtitle{color:var(--muted); font-size:14px}
+
+  /* Controls */
+  .controls{
+    margin-top:20px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+  }
+  .field, .select{
+    position:relative; min-width:220px; flex:1 1 260px;
+  }
+  .input, .select select{
+    width:100%; background:var(--panel); border:1px solid var(--border);
+    color:var(--text); padding:12px 14px 12px 40px; border-radius:12px; outline:none;
+    box-shadow:var(--shadow);
+  }
+  .field svg, .select svg{
+    position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.7;
+  }
+  .select{max-width:240px}
+  .select select{appearance:none; padding-left:40px; padding-right:34px}
+  .select .chev{right:12px; left:auto}
+
+  .batch{
+    margin-left:auto; display:flex; gap:8px; align-items:center;
+    opacity:0; pointer-events:none; transform:translateY(4px); transition:.18s;
+  }
+  .batch.active{opacity:1; pointer-events:auto; transform:none}
+
+  /* Grid */
+  .grid{
+    margin-top:26px; display:grid; gap:18px;
+    grid-template-columns: repeat( auto-fill, minmax(280px, 1fr) );
+  }
+
+  /* Card */
+  .card{
+    position:relative; overflow:hidden; border-radius:var(--radius);
+    background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+    border:1px solid var(--border); box-shadow:var(--shadow);
+    padding:18px; display:flex; flex-direction:column; gap:12px; min-height:180px;
+    transition:.18s transform, .18s border-color, .18s box-shadow, .18s background;
+    cursor:pointer;
+    backdrop-filter: saturate(130%) blur(4px);
+  }
+  .card:hover{transform:translateY(-2px); border-color:#2f3642}
+  .card.selected{
+    box-shadow:0 0 0 2px rgba(37,99,235,.9), 0 18px 45px rgba(0,0,0,.45);
+    border-color:transparent; background:linear-gradient(180deg, rgba(37,99,235,.12), rgba(255,255,255,.04));
+  }
+  .card .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12px; padding:6px 10px; border-radius:999px;
+    background:rgba(34,197,94,.1); color:#74f3a2; border:1px solid rgba(34,197,94,.25);
+    width:max-content;
+  }
+  .card h3{margin:4px 0 2px; font-size:18px}
+  .card p{margin:0; color:var(--muted); font-size:14px}
+  .meta{margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:8px; color:var(--muted); font-size:13px}
+  .dot{width:6px; height:6px; border-radius:50%; background:#7dd3fc; box-shadow:0 0 10px #38bdf8aa}
+  .kebab{background:transparent; border:0; color:var(--muted); cursor:pointer; padding:6px 8px; border-radius:8px}
+  .kebab:hover{background:var(--panel-strong); color:var(--text)}
+
+  /* selection tick */
+  .tick{
+    position:absolute; top:10px; left:10px; width:24px; height:24px; border-radius:50%;
+    border:1px solid var(--border); background:rgba(0,0,0,.35); display:grid; place-items:center;
+    transition:.18s; box-shadow:var(--shadow)
+  }
+  .card.selected .tick{background:var(--brand); border-color:transparent}
+
+  /* Empty state */
+  .empty{
+    margin:40px 0; padding:28px; border-radius:18px; border:1px dashed #2a2f39; color:var(--muted);
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    display:none;
+  }
+
+  @media (max-width:560px){
+    .rightbar{gap:6px}
+    .pill{display:none}
+    .btn--ghost{display:none}
+  }
+</style>
+</head>
+<body>
+
+  <div class="shell">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">📘</div>
+        <span>WeScape</span>
+      </div>
+
+      <div class="rightbar">
+        <div class="pill" title="Utente loggato">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" stroke="currentColor" stroke-width="1.5"/></svg>
+          <span>luca.tomasinoj@gmail.com</span>
+        </div>
+        <button class="btn btn--ghost" title="Impostazioni">
+          ⚙️
+        </button>
+        <button class="btn btn--brand" id="toggleTheme" type="button" aria-pressed="false">🌙 Light Mode</button>
+        <button class="btn btn--ghost" type="button">Logout</button>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div class="title">
+      <div>
+        <h1>I tuoi trip</h1>
+        <div class="subtitle"><span id="count">2</span> trip creati</div>
+      </div>
+      <button class="btn btn--brand" id="newTrip">＋ Nuovo trip</button>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <label class="field" aria-label="Cerca trip">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 7.5-7.5 7.5 7.5 0 0 1-7.5 7.5Z" stroke="currentColor" stroke-width="1.5"/></svg>
+        <input class="input" id="search" placeholder="Cerca per titolo o descrizione…" />
+      </label>
+
+      <label class="select" aria-label="Ordina">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6h12M3 12h9M3 18h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <select id="sort">
+          <option value="recent">Più recenti</option>
+          <option value="old">Meno recenti</option>
+          <option value="az">A → Z</option>
+          <option value="za">Z → A</option>
+        </select>
+        <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </label>
+
+      <div class="batch" id="batch">
+        <span class="subtitle" id="selCount">0 selezionati</span>
+        <button class="btn btn--ghost" id="openSel">Apri</button>
+        <button class="btn btn--danger" id="deleteSel">Elimina</button>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid" id="grid" role="list">
+      <!-- Card 1 -->
+      <article class="card" tabindex="0" role="listitem" data-title="Viaggio Test in Sicilia" data-date="2025-08-11">
+        <div class="tick" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="m5 13 4 4 10-10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 7h18M6 7v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7" stroke="currentColor" stroke-width="1.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.5"/></svg>
+          Trip
+        </span>
+        <h3>Viaggio Test in Sicilia</h3>
+        <p>Un viaggio di prova per testare la nuova funzionalità con il campo title corretto</p>
+        <div class="meta">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="dot"></span>
+            <span>11 ago 2025</span>
+          </div>
+          <button class="kebab" title="Altro">⋮</button>
+        </div>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="card" tabindex="0" role="listitem" data-title="Pippo2" data-date="2025-08-07">
+        <div class="tick" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="m5 13 4 4 10-10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 7h18M6 7v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7" stroke="currentColor" stroke-width="1.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.5"/></svg>
+          Trip
+        </span>
+        <h3>Pippo2</h3>
+        <p>Plan your next adventure</p>
+        <div class="meta">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="dot"></span>
+            <span>7 ago 2025</span>
+          </div>
+          <button class="kebab" title="Altro">⋮</button>
+        </div>
+      </article>
+    </div>
+
+    <div class="empty" id="empty">Nessun trip corrisponde ai filtri. Prova a cambiare la ricerca o crea un nuovo itinerario.</div>
+  </div>
+
+<script>
+  // Light/Dark text only toggle (mantiene stessa palette)
+  const toggle = document.getElementById('toggleTheme');
+  let light = false;
+  toggle.addEventListener('click', ()=>{
+    light = !light;
+    document.body.style.filter = light ? 'invert(1) hue-rotate(180deg)' : 'none';
+    toggle.textContent = light ? '🌞 Dark Mode' : '🌙 Light Mode';
+    toggle.setAttribute('aria-pressed', String(light));
+  });
+
+  // Selection handling
+  const grid = document.getElementById('grid');
+  const batch = document.getElementById('batch');
+  const selCount = document.getElementById('selCount');
+
+  function updateBatch(){
+    const selected = grid.querySelectorAll('.card.selected').length;
+    selCount.textContent = selected + ' selezionati';
+    batch.classList.toggle('active', selected>0);
+  }
+
+  grid.addEventListener('click', (e)=>{
+    const card = e.target.closest('.card');
+    if(!card) return;
+    card.classList.toggle('selected');
+    updateBatch();
+  });
+
+  // Keyboard select (Space/Enter)
+  grid.addEventListener('keydown', (e)=>{
+    if((e.key === ' ' || e.key === 'Enter') && e.target.classList.contains('card')){
+      e.preventDefault();
+      e.target.classList.toggle('selected');
+      updateBatch();
+    }
+  });
+
+  // Search + sort
+  const search = document.getElementById('search');
+  const sort = document.getElementById('sort');
+  const empty = document.getElementById('empty');
+  const count = document.getElementById('count');
+
+  function refresh(){
+    const q = search.value.trim().toLowerCase();
+    let cards = Array.from(grid.querySelectorAll('.card'));
+
+    // Filter
+    cards.forEach(c=>{
+      const title = c.dataset.title.toLowerCase();
+      const desc = c.querySelector('p').textContent.toLowerCase();
+      const match = !q || title.includes(q) || desc.includes(q);
+      c.style.display = match ? '' : 'none';
+    });
+
+    // Sort
+    cards = cards.filter(c=>c.style.display !== 'none');
+    cards.sort((a,b)=>{
+      const mode = sort.value;
+      if(mode==='recent') return new Date(b.dataset.date)-new Date(a.dataset.date);
+      if(mode==='old')    return new Date(a.dataset.date)-new Date(b.dataset.date);
+      if(mode==='az')     return a.dataset.title.localeCompare(b.dataset.title);
+      if(mode==='za')     return b.dataset.title.localeCompare(a.dataset.title);
+      return 0;
+    });
+    cards.forEach(c=>grid.appendChild(c));
+
+    empty.style.display = cards.length ? 'none' : 'block';
+    count.textContent = grid.querySelectorAll('.card').length;
+  }
+  search.addEventListener('input', refresh);
+  sort.addEventListener('change', refresh);
+  refresh();
+
+  // Demo actions
+  document.getElementById('openSel').addEventListener('click', ()=>{
+    const titles = Array.from(grid.querySelectorAll('.card.selected h3')).map(h=>h.textContent);
+    if(titles.length) alert('Apri: ' + titles.join(', '));
+  });
+  document.getElementById('deleteSel').addEventListener('click', ()=>{
+    grid.querySelectorAll('.card.selected').forEach(c=>c.remove());
+    updateBatch(); refresh();
+  });
+  document.getElementById('newTrip').addEventListener('click', ()=>{
+    alert('Nuovo trip — apri il wizard di creazione');
+  });
+</script>
+</body>
+</html>

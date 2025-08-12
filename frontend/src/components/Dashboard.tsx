@@ -5,6 +5,7 @@ import { useTrips } from '../hooks/useTrips';
 import type { Trip } from '../hooks/useTrips';
 import { useCanvasStore } from '../stores/canvasStore';
 import ThemeToggle from './ui/ThemeToggle';
+import VideoBackground from './ui/VideoBackground';
 import TripsList from './dashboard/TripsList';
 import CreateTripModal from './dashboard/CreateTripModal';
 import EditTripModal from './dashboard/EditTripModal';
@@ -62,10 +63,10 @@ const Dashboard: React.FC = () => {
     setShowSettings(false);
   };
 
-  const handleCreateTrip = async (title: string, description?: string) => {
+  const handleCreateTrip = async (title: string, description?: string, coverImage?: string) => {
     setCreateLoading(true);
     try {
-      const newTrip = await createTrip(title, description);
+      const newTrip = await createTrip(title, description, coverImage);
       if (newTrip) {
         setShowCreateModal(false);
         // Optionally open the newly created trip
@@ -108,118 +109,57 @@ const Dashboard: React.FC = () => {
   // If a trip is selected, show the canvas
   if (selectedTrip) {
     return (
-      <div className={`
-        min-h-screen w-full transition-colors
-        ${isDark ? 'bg-black' : 'bg-gray-50'}
-      `}>
-        {/* Canvas Header */}
-        <header className={`
-          flex items-center justify-between p-6 border-b
-          ${isDark ? 'border-white/10' : 'border-gray-200'}
-        `}>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleBackToDashboard}
-              className={`
-                p-2 rounded-lg transition-all hover:scale-110
-                ${isDark 
-                  ? 'text-white/60 hover:text-white hover:bg-white/10' 
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                }
-              `}
-              title="Torna alla dashboard"
-            >
-              ← 
-            </button>
-            <h1 className={`
-              text-2xl font-bold
-              ${isDark ? 'text-white' : 'text-gray-900'}
-            `}>
-              {selectedTrip.title}
-            </h1>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <span className={`
-              text-sm px-3 py-1 rounded-full
-              ${isDark ? 'bg-white/10 text-white/70' : 'bg-gray-100 text-gray-600'}
-            `}>
-              {user?.email}
-            </span>
-            <ThemeToggle />
-            <button
-              onClick={handleSignOut}
-              className={`
-                px-4 py-2 rounded-lg font-medium transition-all hover:scale-105 border
-                ${isDark 
-                  ? 'bg-white/10 border-white/20 text-white hover:bg-white/20' 
-                  : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
-                }
-              `}
-            >
-              Logout
-            </button>
-          </div>
-        </header>
-
-        {/* Canvas */}
-        <main className="h-[calc(100vh-88px)] w-full">
-          <TripCanvas />
-        </main>
-      </div>
+      <TripCanvas 
+        tripTitle={selectedTrip.title}
+        onBackToDashboard={handleBackToDashboard}
+        user={user}
+        onSignOut={handleSignOut}
+      />
     );
   }
 
   // Dashboard view
   return (
-    <div className={`
-      min-h-screen w-full transition-colors
-      ${isDark ? 'bg-black' : 'bg-gray-50'}
-    `}>
+    <div className="min-h-screen w-full relative">
+      {/* Video Background */}
+      <VideoBackground />
+      
       {/* Header */}
-      <header className={`
-        flex items-center justify-between p-6 border-b
-        ${isDark ? 'border-white/10' : 'border-gray-200'}
-      `}>
+      <header className="flex items-center justify-between p-6 border-b glass-effect-strong" style={{ borderColor: 'var(--wescape-border)' }}>
         <div className="flex items-center gap-4">
-          <h1 className={`
-            text-2xl font-bold
-            ${isDark ? 'text-white' : 'text-gray-900'}
-          `}>
-            🗺️ WeScape
-          </h1>
-          <span className={`
-            text-sm px-3 py-1 rounded-full
-            ${isDark ? 'bg-white/10 text-white/70' : 'bg-gray-100 text-gray-600'}
-          `}>
-            {user?.email}
-          </span>
+          <div className="flex items-center gap-3">
+            <img 
+              src="/logo_transparent.png" 
+              alt="Triptify" 
+              className="w-8 h-8 floating"
+            />
+            <h1 className="text-2xl font-bold text-wescape-text tracking-wide">
+              Triptify
+            </h1>
+          </div>
+          <div className="glass-effect px-3 py-1 rounded-full text-sm text-wescape-muted flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+            <span>{user?.email}</span>
+          </div>
         </div>
         
         <div className="flex items-center gap-3">
           <button
             onClick={handleShowSettings}
-            className={`
-              p-2 rounded-lg transition-all hover:scale-110
-              ${isDark 
-                ? 'text-white/60 hover:text-white hover:bg-white/10' 
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-              }
-            `}
+            className="p-2 rounded-lg transition-all hover:scale-110 text-wescape-muted hover:text-wescape-text glass-effect hover:glass-effect-strong"
             title="Impostazioni"
           >
-            ⚙️
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+              <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1m16.5-3.5L19 7l-1.5-1.5M5 7 3.5 5.5M19 17l-1.5 1.5M5 17l1.5 1.5" stroke="currentColor" strokeWidth="2"/>
+            </svg>
           </button>
           <ThemeToggle />
           <button
             onClick={handleSignOut}
-            className={`
-              px-4 py-2 rounded-lg font-medium transition-all hover:scale-105 border
-              ${isDark 
-                ? 'bg-white/10 border-white/20 text-white hover:bg-white/20' 
-                : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
-              }
-            `}
+            className="px-4 py-2 rounded-lg font-medium transition-all hover:scale-105 glass-effect-strong text-wescape-text hover:text-white wescape-hover"
           >
             Logout
           </button>

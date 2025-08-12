@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useTheme } from '../../contexts/ThemeContext';
 import { useToastContext } from '../../contexts/ToastContext';
 
 interface SignupFormProps {
@@ -16,7 +15,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
   
   const { signUp } = useAuth();
-  const { isDark } = useTheme();
   const { showToast } = useToastContext();
 
   const validateForm = () => {
@@ -75,136 +73,121 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className={`
-        p-8 rounded-xl border backdrop-blur-sm
-        ${isDark 
-          ? 'bg-white/5 border-white/10' 
-          : 'bg-white/80 border-gray-200'
-        }
-      `}>
-        <h2 className={`
-          text-2xl font-bold text-center mb-6
-          ${isDark ? 'text-white' : 'text-gray-900'}
-        `}>
-          Registrati a WeScape
-        </h2>
+      <div className="glass-effect-strong rounded-wescape p-8 modal-enter">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <img 
+              src="/logo_transparent.png" 
+              alt="Triptify" 
+              className="w-12 h-12 floating"
+            />
+            <h2 className="text-3xl font-bold text-wescape-text tracking-wide">
+              Inizia oggi
+            </h2>
+          </div>
+          <p className="text-wescape-muted text-sm">
+            Crea il tuo account Triptify gratuitamente
+          </p>
+        </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className={`
-              block text-sm font-medium mb-2
-              ${isDark ? 'text-white/90' : 'text-gray-700'}
-            `}>
-              Nome Completo *
+          <div className="group">
+            <label className="block text-sm font-medium mb-2 text-wescape-text">
+              <span className="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-wescape-muted">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2"/>
+                  <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                Nome Completo *
+              </span>
             </label>
             <input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className={`
-                w-full px-4 py-3 rounded-lg border transition-all
-                focus:outline-none focus:ring-2 focus:ring-blue-500/50
-                ${isDark 
-                  ? 'bg-white/10 border-white/20 text-white placeholder-white/50' 
-                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                }
-              `}
+              className="w-full px-4 py-3 rounded-wescape glass-effect text-wescape-text placeholder-wescape-muted transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-wescape-brand/50 wescape-hover disabled:opacity-50"
               placeholder="es. Mario Rossi"
               disabled={isLoading}
             />
           </div>
 
-          <div>
-            <label className={`
-              block text-sm font-medium mb-2
-              ${isDark ? 'text-white/90' : 'text-gray-700'}
-            `}>
-              Username (opzionale)
+          <div className="group">
+            <label className="block text-sm font-medium mb-2 text-wescape-text">
+              <span className="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-wescape-muted">
+                  <path d="M12 12s-3-1-6-1-6 2-6 2 3 1 6 1 6-2 6-2z" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M2 5s3-1 6-1 6 2 6 2-3 1-6 1-6-2-6-2z" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                Username (opzionale)
+              </span>
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className={`
-                w-full px-4 py-3 rounded-lg border transition-all
-                focus:outline-none focus:ring-2 focus:ring-blue-500/50
-                ${isDark 
-                  ? 'bg-white/10 border-white/20 text-white placeholder-white/50' 
-                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                }
-              `}
+              className="w-full px-4 py-3 rounded-wescape glass-effect text-wescape-text placeholder-wescape-muted transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-wescape-brand/50 wescape-hover disabled:opacity-50"
               placeholder="es. mariorossi"
               disabled={isLoading}
             />
           </div>
 
-          <div>
-            <label className={`
-              block text-sm font-medium mb-2
-              ${isDark ? 'text-white/90' : 'text-gray-700'}
-            `}>
-              Email
+          <div className="group">
+            <label className="block text-sm font-medium mb-2 text-wescape-text">
+              <span className="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-wescape-muted">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" strokeWidth="2"/>
+                  <polyline points="22,6 12,13 2,6" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                Email *
+              </span>
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`
-                w-full px-4 py-3 rounded-lg border transition-all
-                focus:outline-none focus:ring-2 focus:ring-blue-500/50
-                ${isDark 
-                  ? 'bg-white/10 border-white/20 text-white placeholder-white/50' 
-                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                }
-              `}
-              placeholder="inserisci la tua email"
+              className="w-full px-4 py-3 rounded-wescape glass-effect text-wescape-text placeholder-wescape-muted transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-wescape-brand/50 wescape-hover disabled:opacity-50"
+              placeholder="la tua email"
               disabled={isLoading}
             />
           </div>
           
-          <div>
-            <label className={`
-              block text-sm font-medium mb-2
-              ${isDark ? 'text-white/90' : 'text-gray-700'}
-            `}>
-              Password
+          <div className="group">
+            <label className="block text-sm font-medium mb-2 text-wescape-text">
+              <span className="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-wescape-muted">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" strokeWidth="2"/>
+                  <circle cx="12" cy="16" r="1" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                Password *
+              </span>
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`
-                w-full px-4 py-3 rounded-lg border transition-all
-                focus:outline-none focus:ring-2 focus:ring-blue-500/50
-                ${isDark 
-                  ? 'bg-white/10 border-white/20 text-white placeholder-white/50' 
-                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                }
-              `}
+              className="w-full px-4 py-3 rounded-wescape glass-effect text-wescape-text placeholder-wescape-muted transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-wescape-brand/50 wescape-hover disabled:opacity-50"
               placeholder="crea una password (min. 6 caratteri)"
               disabled={isLoading}
             />
           </div>
           
-          <div>
-            <label className={`
-              block text-sm font-medium mb-2
-              ${isDark ? 'text-white/90' : 'text-gray-700'}
-            `}>
-              Conferma Password
+          <div className="group">
+            <label className="block text-sm font-medium mb-2 text-wescape-text">
+              <span className="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-wescape-muted">
+                  <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                Conferma Password *
+              </span>
             </label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className={`
-                w-full px-4 py-3 rounded-lg border transition-all
-                focus:outline-none focus:ring-2 focus:ring-blue-500/50
-                ${isDark 
-                  ? 'bg-white/10 border-white/20 text-white placeholder-white/50' 
-                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                }
-              `}
+              className="w-full px-4 py-3 rounded-wescape glass-effect text-wescape-text placeholder-wescape-muted transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-wescape-brand/50 wescape-hover disabled:opacity-50"
               placeholder="conferma la password"
               disabled={isLoading}
             />
@@ -213,41 +196,41 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`
-              w-full py-3 px-4 rounded-lg font-medium transition-all
-              hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500/50
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
-              ${isDark 
-                ? 'bg-green-600 hover:bg-green-500 text-white' 
-                : 'bg-green-600 hover:bg-green-700 text-white'
-              }
-            `}
+            className="w-full py-4 px-6 rounded-wescape font-medium transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-wescape-success/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 glass-effect-strong text-wescape-text hover:text-white ripple-effect mt-6"
+            style={{ background: 'linear-gradient(135deg, var(--wescape-success), #16a34a)' }}
           >
             {isLoading ? (
-              <span className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                Registrazione in corso...
+              <span className="flex items-center justify-center gap-3">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <span>Creazione account...</span>
               </span>
             ) : (
-              'Registrati'
+              <span className="flex items-center justify-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Crea Account Gratuito
+              </span>
             )}
           </button>
         </form>
         
-        <div className={`
-          mt-6 text-center text-sm
-          ${isDark ? 'text-white/70' : 'text-gray-600'}
-        `}>
-          Hai già un account?{' '}
-          <button
-            onClick={onSwitchToLogin}
-            className={`
-              font-medium transition-colors hover:underline
-              ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}
-            `}
-          >
-            Accedi
-          </button>
+        <div className="mt-8 text-center">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1 h-px bg-wescape-border"></div>
+            <span className="text-xs text-wescape-muted font-medium">GIÀ REGISTRATO?</span>
+            <div className="flex-1 h-px bg-wescape-border"></div>
+          </div>
+          
+          <p className="text-sm text-wescape-muted">
+            Hai già un account?{' '}
+            <button
+              onClick={onSwitchToLogin}
+              className="font-medium text-wescape-brand hover:text-white transition-all duration-300 hover:underline"
+            >
+              Accedi qui
+            </button>
+          </p>
         </div>
       </div>
     </div>

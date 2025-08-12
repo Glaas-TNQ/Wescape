@@ -20,7 +20,14 @@ import { useToast } from '../../hooks/useToast';
 import { useAuth } from '../../contexts/AuthContext';
 import { handlePasteImage, uploadImage, getOptimalImageDimensions } from '../../utils/imageUpload';
 
-const TripCanvas = () => {
+interface TripCanvasProps {
+  tripTitle?: string;
+  onBackToDashboard?: () => void;
+  user?: any;
+  onSignOut?: () => void;
+}
+
+const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }: TripCanvasProps = {}) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
   const [nestedCanvasNodeId, setNestedCanvasNodeId] = useState<string | null>(null);
@@ -33,7 +40,8 @@ const TripCanvas = () => {
   } | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const { toasts, removeToast, toast } = useToast();
-  const { user } = useAuth();
+  const { user: authUser } = useAuth();
+  const user = propUser || authUser;
   const { isDark } = useTheme();
   const themeColors = getThemeColors(isDark);
   const canvasBackground = getCanvasBackground(isDark);
@@ -261,8 +269,18 @@ const TripCanvas = () => {
         }}
       >
         <div className="flex items-center gap-4">
+          {onBackToDashboard && (
+            <button
+              onClick={onBackToDashboard}
+              className="p-2 rounded-lg transition-all hover:scale-110 hover:bg-white/10"
+              style={{ color: themeColors.text.secondary }}
+              title="Torna alla dashboard"
+            >
+              ←
+            </button>
+          )}
           <div className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-            WeScape Canvas
+            {tripTitle ? `${tripTitle} - Canvas` : 'Triptify Canvas'}
           </div>
           <div 
             className="text-sm px-3 py-1 rounded-full"
@@ -307,7 +325,18 @@ const TripCanvas = () => {
         
         <ViewSwitcher />
         
-        <div className="flex gap-4">
+        <div className="flex items-center gap-4">
+          {user && onSignOut && (
+            <span 
+              className="text-sm px-3 py-1 rounded-full"
+              style={{
+                color: themeColors.text.secondary,
+                backgroundColor: isDark ? 'rgba(55, 65, 81, 0.5)' : 'rgba(243, 244, 246, 0.8)'
+              }}
+            >
+              {user.email}
+            </span>
+          )}
           <ThemeToggle />
           <button 
             className="px-5 py-2.5 rounded-lg font-medium transition-all hover:scale-105 border"
@@ -328,6 +357,25 @@ const TripCanvas = () => {
           <button className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white font-medium hover:from-indigo-500 hover:to-purple-500 transition-all hover:scale-105 shadow-lg shadow-indigo-600/25">
             Save Trip
           </button>
+          {onSignOut && (
+            <button
+              onClick={onSignOut}
+              className="px-4 py-2 rounded-lg font-medium transition-all hover:scale-105 border"
+              style={{
+                backgroundColor: themeColors.interactive.hover,
+                borderColor: themeColors.border.secondary,
+                color: themeColors.text.primary
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = themeColors.interactive.active;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = themeColors.interactive.hover;
+              }}
+            >
+              Logout
+            </button>
+          )}
         </div>
       </div>
 

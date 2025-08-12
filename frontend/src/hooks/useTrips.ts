@@ -61,7 +61,7 @@ export const useTrips = () => {
     }
   };
 
-  const createTrip = async (title: string, description?: string) => {
+  const createTrip = async (title: string, description?: string, coverImage?: string) => {
     if (!user) {
       showToast('Devi essere loggato per creare un trip', 'error');
       return null;
@@ -74,6 +74,7 @@ export const useTrips = () => {
           {
             title,
             description: description || null,
+            cover_image: coverImage || null,
             user_id: user.id,
           },
         ])
