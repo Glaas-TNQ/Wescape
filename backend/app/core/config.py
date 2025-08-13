@@ -1,30 +1,42 @@
 import os
 from functools import lru_cache
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     """Application settings"""
     
+    # Project Configuration
+    PROJECT_NAME: str = "WeScape API"
+    API_V1_STR: str = "/api/v1"
+    
     # API Configuration
-    API_BASE_URL: str = os.getenv("API_BASE_URL", "http://localhost:8000")
-    DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
+    API_BASE_URL: str = "http://localhost:8000"
+    DEBUG: bool = False
     
     # Supabase Configuration
-    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
-    SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
-    SUPABASE_SERVICE_ROLE_KEY: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+    SUPABASE_URL: str = ""
+    SUPABASE_KEY: str = ""
+    SUPABASE_SERVICE_ROLE_KEY: str = ""
+    SUPABASE_JWT_SECRET: str = ""
+    
+    # Auth Configuration
+    SECRET_KEY: str = "your-secret-key-change-in-production"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ALGORITHM: str = "HS256"
+    
+    # CORS Configuration
+    BACKEND_CORS_ORIGINS: str = '["*"]'
     
     # n8n Integration
-    N8N_CHAT_WEBHOOK_URL: str = os.getenv("N8N_CHAT_WEBHOOK_URL", "")
+    N8N_CHAT_WEBHOOK_URL: str = ""
     
     # Rate Limiting
-    CHAT_RATE_LIMIT_PER_MINUTE: int = int(os.getenv("CHAT_RATE_LIMIT_PER_MINUTE", "10"))
+    CHAT_RATE_LIMIT_PER_MINUTE: int = 10
     
-    # Security
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
-    
-    class Config:
-        env_file = ".env"
+    model_config = {
+        "env_file": ".env",
+        "extra": "ignore"  # Permette campi extra nel .env senza errori
+    }
 
 @lru_cache()
 def get_settings() -> Settings:

@@ -309,20 +309,81 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
   },
 
   loadTripCanvas: async (tripId: string) => {
+    const startTime = performance.now();
+    console.group(`📥 LOAD CANVAS: ${tripId}`);
+    
     try {
+      // Log pre-caricamento
+      console.log('🔍 Loading Canvas for Trip:', {
+        tripId,
+        timestamp: new Date().toISOString()
+      });
+
+      // Log della query Supabase
+      console.log('🔍 Supabase Query:', {
+        table: 'trips',
+        operation: 'select',
+        fields: ['canvas_data'],
+        filter: { id: tripId },
+        modifier: 'single()'
+      });
+
       const { data, error } = await supabase
         .from('trips')
         .select('canvas_data')
         .eq('id', tripId)
         .single();
 
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+
       if (error) {
-        console.error('Error loading trip canvas:', error);
+        console.error('❌ Supabase Load Error:', {
+          error,
+          errorCode: error.code,
+          errorMessage: error.message,
+          errorDetails: error.details,
+          errorHint: error.hint,
+          duration: `${duration.toFixed(2)}ms`,
+          tripId
+        });
         return;
       }
 
+      // Log dei dati ricevuti
+      console.log('📦 Raw Data Received:', {
+        data,
+        hasCanvasData: !!data?.canvas_data,
+        canvasDataType: typeof data?.canvas_data,
+        duration: `${duration.toFixed(2)}ms`
+      });
+
       const canvasData = data?.canvas_data;
+      
+      // Log analisi canvas data
+      if (canvasData) {
+        console.log('🔍 Canvas Data Analysis:', {
+          isObject: typeof canvasData === 'object',
+          hasNodes: !!canvasData.nodes,
+          hasEdges: !!canvasData.edges,
+          nodeCount: canvasData.nodes?.length || 0,
+          edgeCount: canvasData.edges?.length || 0,
+          lastModified: canvasData.lastModified,
+          canvasDataSize: JSON.stringify(canvasData).length
+        });
+        
+        console.log('📝 Loaded Nodes:', canvasData.nodes);
+        console.log('🔗 Loaded Edges:', canvasData.edges);
+      } else {
+        console.warn('⚠️ No Canvas Data Found:', {
+          message: 'canvas_data is null, undefined, or empty',
+          receivedData: data
+        });
+      }
+
       if (canvasData && typeof canvasData === 'object' && canvasData.nodes && canvasData.edges) {
+        console.log('✅ Setting Canvas State with Loaded Data');
+        
         set(state => ({
           ...state,
           nodes: canvasData.nodes,
@@ -333,7 +394,16 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
           history: [{ nodes: canvasData.nodes, edges: canvasData.edges }],
           historyIndex: 0,
         }));
+
+        console.log('✅ Canvas Loaded Successfully:', {
+          tripId,
+          nodesLoaded: canvasData.nodes.length,
+          edgesLoaded: canvasData.edges.length,
+          duration: `${duration.toFixed(2)}ms`
+        });
       } else {
+        console.log('🆕 Initializing Empty Canvas (no data found)');
+        
         // No canvas data exists, start with empty canvas
         set(state => ({
           ...state,
@@ -344,13 +414,34 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
           history: [{ nodes: [], edges: [] }],
           historyIndex: 0,
         }));
+
+        console.log('✅ Empty Canvas Initialized:', {
+          tripId,
+          reason: 'No valid canvas_data found',
+          duration: `${duration.toFixed(2)}ms`
+        });
       }
     } catch (error) {
-      console.error('Error loading trip canvas:', error);
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+      
+      console.error('💥 Load Canvas Error:', {
+        error,
+        errorName: error?.name,
+        errorMessage: error?.message,
+        errorStack: error?.stack,
+        duration: `${duration.toFixed(2)}ms`,
+        tripId
+      });
+    } finally {
+      console.groupEnd();
     }
   },
 
   saveTripCanvas: async (tripId: string) => {
+    const startTime = performance.now();
+    console.group(`🔄 SAVE CANVAS: ${tripId}`);
+    
     try {
       const state = get();
       const canvasData = {
@@ -359,23 +450,78 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
         lastModified: new Date().toISOString(),
       };
 
-      const { error } = await supabase
+      // Log pre-salvataggio
+      console.log('📊 Canvas State to Save:', {
+        tripId,
+        nodeCount: state.nodes.length,
+        edgeCount: state.edges.length,
+        canvasDataSize: JSON.stringify(canvasData).length,
+        timestamp: new Date().toISOString()
+      });
+      
+      console.log('📝 Nodes Data:', state.nodes);
+      console.log('🔗 Edges Data:', state.edges);
+      console.log('💾 Full Canvas Data:', canvasData);
+
+      // Log della query Supabase
+      console.log('🔍 Supabase Query:', {
+        table: 'trips',
+        operation: 'update',
+        filter: { id: tripId },
+        payload: {
+          canvas_data: canvasData,
+          updated_at: new Date().toISOString()
+        }
+      });
+
+      const { data, error } = await supabase
         .from('trips')
         .update({
           canvas_data: canvasData,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', tripId);
+        .eq('id', tripId)
+        .select(); // Aggiungiamo select per vedere cosa viene restituito
+
+      const endTime = performance.now();
+      const duration = endTime - startTime;
 
       if (error) {
-        console.error('Error saving trip canvas:', error);
+        console.error('❌ Supabase Error Details:', {
+          error,
+          errorCode: error.code,
+          errorMessage: error.message,
+          errorDetails: error.details,
+          errorHint: error.hint,
+          duration: `${duration.toFixed(2)}ms`
+        });
         throw error;
       }
 
-      console.log('Canvas saved successfully for trip:', tripId);
+      console.log('✅ Canvas Saved Successfully:', {
+        tripId,
+        duration: `${duration.toFixed(2)}ms`,
+        responseData: data,
+        nodesCount: state.nodes.length,
+        edgesCount: state.edges.length
+      });
+
     } catch (error) {
-      console.error('Error saving trip canvas:', error);
+      const endTime = performance.now();
+      const duration = endTime - startTime;
+      
+      console.error('💥 Save Canvas Error:', {
+        error,
+        errorName: error?.name,
+        errorMessage: error?.message,
+        errorStack: error?.stack,
+        duration: `${duration.toFixed(2)}ms`,
+        tripId
+      });
+      
       throw error;
+    } finally {
+      console.groupEnd();
     }
   },
 

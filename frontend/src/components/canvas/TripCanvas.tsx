@@ -21,7 +21,8 @@ import PinterestBoardModal from './modals/PinterestBoardModal';
 import { useToast } from '../../hooks/useToast';
 import { useAuth } from '../../contexts/AuthContext';
 import { handlePasteImage, uploadImage, getOptimalImageDimensions } from '../../utils/imageUpload';
-import { ChatSidebar, useChatStore } from '../chat';
+import { ChatSidebar } from '../chat';
+import { useChatStore } from '../../stores/chatStore';
 
 interface TripCanvasProps {
   tripTitle?: string;
@@ -30,7 +31,7 @@ interface TripCanvasProps {
   onSignOut?: () => void;
 }
 
-const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }: TripCanvasProps = {}) => {
+const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }: TripCanvasProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
   const [nestedCanvasNodeId, setNestedCanvasNodeId] = useState<string | null>(null);
@@ -49,12 +50,13 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
     nodeId: string | null;
     boardData: any;
   }>({ isOpen: false, nodeId: null, boardData: null });
+  const [isSaving, setIsSaving] = useState(false);
   const { toasts, removeToast, toast } = useToast();
   const { user: authUser } = useAuth();
   const user = propUser || authUser;
   
   // Chat integration
-  const { setCanvasContext } = useChatStore();
+  const { setCanvasContext, isOpen: isChatOpen } = useChatStore();
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   const { isDark } = useTheme();
   const themeColors = getThemeColors(isDark);
@@ -72,6 +74,7 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
     deleteNodes,
     currentTripId,
     setCurrentTrip,
+    saveTripCanvas,
   } = useCanvasStore();
 
   // Custom onConnect with validation
@@ -131,6 +134,42 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
       }
     });
   }, [setCanvasContext]);
+
+  // Handle manual save
+  const handleSaveTrip = useCallback(async () => {
+    if (!currentTripId) {
+      toast.error('Nessun trip selezionato per il salvataggio');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await saveTripCanvas(currentTripId);
+      toast.success('Canvas salvato con successo!');
+    } catch (error) {
+      console.error('Error saving canvas:', error);
+      toast.error('Errore nel salvataggio del canvas');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [currentTripId, saveTripCanvas, toast]);
+
+  // Auto-save when canvas changes (debounced)
+  useEffect(() => {
+    if (!currentTripId || nodes.length === 0) return;
+
+    const autoSaveTimer = setTimeout(async () => {
+      try {
+        console.log('🔄 Auto-saving canvas...');
+        await saveTripCanvas(currentTripId);
+        console.log('✅ Auto-save completed');
+      } catch (error) {
+        console.error('❌ Auto-save failed:', error);
+      }
+    }, 3000); // Auto-save after 3 seconds of inactivity
+
+    return () => clearTimeout(autoSaveTimer);
+  }, [nodes, edges, currentTripId, saveTripCanvas]);
 
   // Handle paste for image screenshots
   const handlePaste = useCallback(async (event: ClipboardEvent) => {
@@ -333,7 +372,10 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
   const canvasStyle = canvasBackground;
 
   return (
-    <div className="w-screen h-screen flex flex-col" style={canvasStyle}>
+    <div 
+      className="w-screen h-screen flex flex-col relative" 
+      style={canvasStyle}
+    >
       {/* Top Bar - Fixed Header */}
       <div 
         className="h-20 backdrop-blur-xl flex items-center justify-between px-8 z-50 flex-shrink-0 border-b"
@@ -344,18 +386,23 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
         }}
       >
         <div className="flex items-center gap-4">
-          {onBackToDashboard && (
-            <button
-              onClick={onBackToDashboard}
-              className="p-2 rounded-lg transition-all hover:scale-110 hover:bg-white/10"
-              style={{ color: themeColors.text.secondary }}
-              title="Torna alla dashboard"
-            >
-              ←
-            </button>
-          )}
+          <button
+            onClick={() => {
+              console.log('🔄 Back button clicked', { onBackToDashboard: !!onBackToDashboard });
+              if (onBackToDashboard) {
+                onBackToDashboard();
+              } else {
+                console.error('⚠️ onBackToDashboard prop is missing!');
+              }
+            }}
+            className="p-2 rounded-lg transition-all hover:scale-110 hover:bg-white/10"
+            style={{ color: themeColors.text.secondary }}
+            title="Torna alla dashboard"
+          >
+            ←
+          </button>
           <div className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-            {tripTitle ? `${tripTitle} - Canvas` : 'Triptify Canvas'}
+            {tripTitle} - Canvas
           </div>
           <div 
             className="text-sm px-3 py-1 rounded-full"
@@ -429,8 +476,19 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
           >
             Share
           </button>
-          <button className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white font-medium hover:from-indigo-500 hover:to-purple-500 transition-all hover:scale-105 shadow-lg shadow-indigo-600/25">
-            Save Trip
+          <button 
+            onClick={handleSaveTrip}
+            disabled={isSaving || !currentTripId}
+            className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white font-medium hover:from-indigo-500 hover:to-purple-500 transition-all hover:scale-105 shadow-lg shadow-indigo-600/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2"
+          >
+            {isSaving ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Salvataggio...
+              </>
+            ) : (
+              'Save Trip'
+            )}
           </button>
           {onSignOut && (
             <button
@@ -586,10 +644,10 @@ const TripCanvas = ({ tripTitle, onBackToDashboard, user: propUser, onSignOut }:
 };
 
 // Main component with ReactFlowProvider
-const TripCanvasWithProvider = () => {
+const TripCanvasWithProvider = (props: TripCanvasProps) => {
   return (
     <ReactFlowProvider>
-      <TripCanvas />
+      <TripCanvas {...props} />
     </ReactFlowProvider>
   );
 };

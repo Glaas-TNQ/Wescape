@@ -110,6 +110,7 @@ const Dashboard: React.FC = () => {
   if (selectedTrip) {
     return (
       <TripCanvas 
+        key={`trip-canvas-${selectedTrip.id}`} // Force re-mount when trip changes
         tripTitle={selectedTrip.title}
         onBackToDashboard={handleBackToDashboard}
         user={user}

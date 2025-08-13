@@ -1,6 +1,21 @@
 import { create } from 'zustand';
 import { type Node } from '@/lib/reactflow-compat';
 
+// AI Response interfaces
+export interface AIGeneratedNode {
+  type: string;
+  data: Record<string, any>;
+  position: { x: number; y: number };
+  connections?: string[];
+}
+
+export interface AIResponse {
+  message: string;
+  nodes?: AIGeneratedNode[];
+  actions?: string[];
+  conversation_id?: string;
+}
+
 // Tipi per il sistema chat
 export interface ChatMessage {
   id: string;

@@ -3,5 +3,6 @@ uvicorn[standard]
 supabase
 httpx
 pydantic
+pydantic-settings
 slowapi
 python-dotenv

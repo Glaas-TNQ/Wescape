@@ -59,13 +59,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ className = '' }) => {
     const value = e.target.value;
     setInput(value);
     
-    // Show suggestions when typing
-    if (value.length > 0) {
-      setShowSuggestions(true);
-      setSelectedSuggestionIndex(-1);
-    } else {
-      setShowSuggestions(false);
-    }
+    // Don't show suggestions automatically when typing
+    setShowSuggestions(false);
     
     // Clear error when user starts typing
     if (hasError) {
@@ -193,41 +188,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ className = '' }) => {
 
   return (
     <div className={`relative ${className}`}>
-      {/* Quick Actions */}
-      <div className="flex flex-wrap gap-2 mb-3">
-        <QuickActionButton
-          icon={<Utensils size={14} />}
-          label="Ristoranti"
-          onClick={() => handleQuickAction('restaurants')}
-          disabled={isLoading}
-        />
-        <QuickActionButton
-          icon={<Activity size={14} />}
-          label="Attività"
-          onClick={() => handleQuickAction('activities')}
-          disabled={isLoading}
-        />
-        <QuickActionButton
-          icon={<Bed size={14} />}
-          label="Hotel"
-          onClick={() => handleQuickAction('hotels')}
-          disabled={isLoading}
-        />
-        <QuickActionButton
-          icon={<Car size={14} />}
-          label="Trasporti"
-          onClick={() => handleQuickAction('transport')}
-          disabled={isLoading}
-        />
-        {canvasContext.existingNodes.length >= 3 && (
-          <QuickActionButton
-            icon={<Sparkles size={14} />}
-            label="Ottimizza"
-            onClick={() => handleQuickAction('optimize')}
-            disabled={isLoading}
-          />
-        )}
-      </div>
 
       {/* Suggestions Dropdown */}
       {showSuggestions && filteredSuggestions.length > 0 && (
@@ -281,14 +241,16 @@ const ChatInput: React.FC<ChatInputProps> = ({ className = '' }) => {
             disabled={isLoading}
             maxLength={500}
             className="
-              w-full px-4 py-3 text-sm
-              bg-gray-800/50 border border-gray-600/30 rounded-xl
+              w-full px-4 py-3.5 text-sm
+              bg-gradient-to-r from-gray-800/60 to-gray-700/60 
+              border border-gray-500/40 rounded-xl
               text-white placeholder-gray-400
               focus:outline-none focus:ring-2 focus:ring-blue-500/50
-              focus:border-blue-500/50
+              focus:border-blue-400/60 focus:bg-gray-700/70
               disabled:opacity-50 disabled:cursor-not-allowed
-              pr-12
+              pr-12 shadow-inner
               transition-all duration-200
+              backdrop-blur-sm
             "
             data-testid="chat-input"
             aria-label="Messaggio per Mona"
@@ -345,21 +307,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ className = '' }) => {
         </button>
       </div>
 
-      {/* Help text */}
-      <div id="input-help" className="flex items-center justify-between mt-2 text-xs text-gray-500">
-        <div className="flex items-center space-x-4">
-          <span>Premi Invio per inviare</span>
-          <span>↑↓ per navigare i suggerimenti</span>
-          <span>Tab per auto-completare</span>
-        </div>
-        
-        {canvasContext.tripId && (
-          <div className="flex items-center space-x-1">
-            <MapPin size={12} />
-            <span>{canvasContext.existingNodes.length} nodi nel canvas</span>
-          </div>
-        )}
-      </div>
 
       {/* Error state */}
       {hasError && (
@@ -399,16 +346,21 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
     onClick={onClick}
     disabled={disabled}
     className="
-      flex items-center space-x-1.5 px-3 py-1.5 text-xs
-      bg-gray-700/50 hover:bg-gray-700 border border-gray-600/30
-      rounded-full transition-all duration-200
+      flex items-center space-x-2 px-4 py-2.5 text-sm font-medium
+      bg-gradient-to-r from-gray-700/60 to-gray-600/60 
+      hover:from-gray-600/80 hover:to-gray-500/80
+      border border-gray-500/30 hover:border-gray-400/50
+      rounded-xl transition-all duration-200
       disabled:opacity-50 disabled:cursor-not-allowed
       hover:scale-105 active:scale-95
+      shadow-lg hover:shadow-xl
+      min-h-[40px] touch-manipulation
+      text-gray-200 hover:text-white
     "
     data-testid={`quick-action-${label.toLowerCase()}`}
   >
-    {icon}
-    <span>{label}</span>
+    <div className="flex-shrink-0">{icon}</div>
+    <span className="whitespace-nowrap">{label}</span>
   </button>
 );
 

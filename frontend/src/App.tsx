@@ -4,7 +4,6 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import AuthLayout from './components/auth/AuthLayout';
 import Dashboard from './components/Dashboard';
-import TripCanvas from './components/canvas/TripCanvas';
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
@@ -20,7 +19,7 @@ const AppContent: React.FC = () => {
     );
   }
 
-  return user ? <TripCanvas /> : <AuthLayout />;
+  return user ? <Dashboard /> : <AuthLayout />;
 };
 
 function App() {
